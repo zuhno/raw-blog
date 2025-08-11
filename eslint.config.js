@@ -11,10 +11,10 @@ const serverTypeChecked = tseslint.configs.recommendedTypeChecked.map((cfg) => (
 }));
 
 export default [
-  globalIgnores(["**/dist", "**/node_modules"]),
+  globalIgnores(["**/dist", "**/node_modules", "**/coverage"]),
   js.configs.recommended,
 
-  // root
+  // root eslint
   {
     files: ["eslint.config.{js,mjs,cjs,ts}"],
     languageOptions: {
@@ -29,7 +29,6 @@ export default [
   ...serverTypeChecked,
   {
     files: ["apps/server/**/*.{ts,js}"],
-    ignores: ["eslint.config.mjs"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

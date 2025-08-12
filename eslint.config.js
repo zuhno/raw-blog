@@ -1,13 +1,19 @@
 import js from "@eslint/js";
+import { globalIgnores } from "eslint/config";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
-import { globalIgnores } from "eslint/config";
+import eslintPluginImport from "eslint-plugin-import";
 
 const serverTypeChecked = tseslint.configs.recommendedTypeChecked.map((cfg) => ({
   ...cfg,
   files: ["apps/server/**/*.{ts,tsx}"],
+}));
+
+const clientRecommended = tseslint.configs.recommended.map((cfg) => ({
+  ...cfg,
+  files: ["apps/client/**/*.{ts,tsx}"],
 }));
 
 export default [
@@ -41,15 +47,27 @@ export default [
         tsconfigRootDir: new URL("./apps/server", import.meta.url),
       },
     },
+    plugins: {
+      import: eslintPluginImport,
+    },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-floating-promises": "warn",
       "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "import/order": [
+        "error",
+        {
+          groups: ["builtin", "external", "internal", ["parent", "sibling", "index"]],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
     },
   },
 
   // apps/client
-  ...tseslint.configs.recommended,
+  ...clientRecommended,
   {
     files: ["apps/client/**/*.{ts,tsx}"],
     languageOptions: {

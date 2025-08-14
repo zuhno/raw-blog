@@ -11,7 +11,7 @@ export class User {
   @Column({ type: "varchar" })
   nickname!: string;
 
-  @Column({ type: "varchar" })
+  @Column({ type: "varchar", nullable: true })
   avatar_url?: string;
 
   @CreateDateColumn({ type: "timestamp" })

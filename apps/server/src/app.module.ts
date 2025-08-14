@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
+import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
 
 @Module({
@@ -14,6 +15,7 @@ import { AuthModule } from "./features/auth/auth.module";
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
     }),
+    SecurityConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [DatabaseModule],
       useClass: DatabaseService,

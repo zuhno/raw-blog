@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity("user")
 export class User {
@@ -11,12 +18,12 @@ export class User {
   @Column({ type: "varchar" })
   nickname!: string;
 
-  @Column({ type: "varchar", nullable: true })
-  avatar_url?: string;
+  @Column({ type: "varchar", name: "avatar_url", nullable: true })
+  avatarUrl?: string;
 
-  @CreateDateColumn({ type: "timestamp" })
-  created_at!: Date;
+  @CreateDateColumn({ type: "timestamp", name: "created_at" })
+  createdAt!: Date;
 
-  @CreateDateColumn({ type: "timestamp" })
-  updated_at!: Date;
+  @UpdateDateColumn({ type: "timestamp", name: "updated_at" })
+  updatedAt!: Date;
 }

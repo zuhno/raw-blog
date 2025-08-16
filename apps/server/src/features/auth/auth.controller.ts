@@ -1,10 +1,12 @@
-import { Controller, Post, Body, UseGuards, Get } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Get, Headers, Res } from "@nestjs/common";
+import type { Response } from "express";
 
 import { AuthService } from "./auth.service";
 import { GoogleExchangeDto } from "./dto/google-exchange.dto";
 import { GoogleAuthGuard } from "./guards/google-auth.guard";
 import { ReqUser } from "../../shared/decorators/req-user.decorator";
 import { RequireUser } from "../../shared/decorators/require-user.decorator";
+import { COOKIE_KEY_REFRESH_TOKEN, COOKIE_POLICY_REFRESH_TOKEN } from "../../shared/utils/constant";
 
 @Controller()
 export class AuthController {
@@ -19,8 +21,20 @@ export class AuthController {
       requireCodeInBody: true,
     })
   )
-  googleExchangeByCode(@Body() googleExchangeDto: GoogleExchangeDto) {
-    return this.authService.googleExchange(googleExchangeDto);
+  async googleExchangeByCode(
+    @Headers() headers: Request["headers"],
+    @Body() googleExchangeDto: GoogleExchangeDto,
+    @Res() res: Response
+  ) {
+    const userAgent = headers["user-agent"] as string;
+    const { accessToken, refreshToken } = await this.authService.googleExchange(
+      googleExchangeDto,
+      userAgent
+    );
+    res.cookie(COOKIE_KEY_REFRESH_TOKEN, refreshToken, {
+      ...COOKIE_POLICY_REFRESH_TOKEN,
+    });
+    return accessToken;
   }
 
   @Get("test")

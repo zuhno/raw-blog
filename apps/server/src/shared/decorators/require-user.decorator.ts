@@ -1,7 +1,7 @@
 import { applyDecorators, UseGuards } from "@nestjs/common";
 
-import { JwtGuard } from "../guards/jwt.guard";
+import { UserGuard } from "../guards/user.guard";
 
 export function RequireUser() {
-  return applyDecorators(UseGuards(JwtGuard));
+  return applyDecorators(UseGuards(UserGuard));
 }

@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import type { Request } from "express";
 
@@ -9,8 +10,11 @@ function extractBearer(h?: string | null): string | null {
 }
 
 @Injectable()
-export class JwtGuard implements CanActivate {
-  constructor(private readonly jwt: JwtService) {}
+export class UserGuard implements CanActivate {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
+  ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const req = ctx.switchToHttp().getRequest<Request>();
@@ -21,9 +25,10 @@ export class JwtGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwt.verifyAsync(token, {
-        issuer: "your-app",
-        audience: "web",
+      const payload = await this.jwtService.verifyAsync(token, {
+        issuer: "raw-blog-server",
+        audience: "raw-blog-client",
+        secret: this.configService.get<string>("GOOGLE_SIGNIN_JWT_SECRET"),
       });
 
       // 3) req.user에 주입

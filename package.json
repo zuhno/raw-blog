@@ -16,7 +16,9 @@
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "@client": "cd apps/client && corepack pnpm",
     "@server": "cd apps/server && corepack pnpm",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start:eslint_d": "eslint_d start",
+    "stop:eslint_d": "eslint_d stop"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

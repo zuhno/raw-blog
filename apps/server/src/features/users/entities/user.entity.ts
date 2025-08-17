@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  OneToMany,
   UpdateDateColumn,
 } from "typeorm";
 
@@ -21,9 +20,9 @@ export class User {
   @Column({ type: "varchar", name: "avatar_url", nullable: true })
   avatarUrl?: string;
 
-  @CreateDateColumn({ type: "timestamp", name: "created_at" })
+  @CreateDateColumn({ type: "timestamptz", name: "created_at" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: "timestamp", name: "updated_at" })
+  @UpdateDateColumn({ type: "timestamptz", name: "updated_at" })
   updatedAt!: Date;
 }

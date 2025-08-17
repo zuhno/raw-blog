@@ -1,4 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -21,17 +26,38 @@ export class AuthService {
     private readonly usersService: UsersService
   ) {}
 
-  async issueAccessToken(user: User) {
+  private async googleOAuthProcess(code: string) {
+    try {
+      const oauth2Client = new google.auth.OAuth2(
+        this.configService.get("GOOGLE_OAUTH_CLIENT_ID"),
+        this.configService.get("GOOGLE_OAUTH_CLIENT_SECRET"),
+        this.configService.get("GOOGLE_OAUTH_REDIRECT_URI")
+      );
+
+      const { tokens } = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(tokens);
+
+      const oauth2 = google.oauth2({ auth: oauth2Client, version: "v2" });
+      const userInfo = await oauth2.userinfo.get();
+      const { email, name, picture } = userInfo.data;
+
+      return { email, name, picture };
+    } catch {
+      throw new BadRequestException("Invalid google code");
+    }
+  }
+
+  private async issueAccessToken(user: User) {
     const payload = { ...user };
     const token = await this.jwtService.signAsync(payload, { expiresIn: "15m" });
     return token;
   }
 
-  async issueRefreshToken(user: User, userAgent: string) {
+  private async issueRefreshToken(user: User, userAgent: string, platform: SignupPlatform) {
     const newAuthSession = this.authRepository.create({
-      platform: SignupPlatform.GOOGLE,
       user,
       userAgent,
+      platform,
     });
     const authSession = await this.authRepository.save(newAuthSession);
     const payload = { jti: authSession.id };
@@ -39,22 +65,10 @@ export class AuthService {
     return token;
   }
 
-  async googleExchange(googleExchangeDto: GoogleExchangeDto, userAgent: string) {
+  async exchangeGoogleCode(googleExchangeDto: GoogleExchangeDto, userAgent: string) {
     const { code } = googleExchangeDto;
 
-    const oauth2Client = new google.auth.OAuth2(
-      this.configService.get("GOOGLE_OAUTH_CLIENT_ID"),
-      this.configService.get("GOOGLE_OAUTH_CLIENT_SECRET"),
-      this.configService.get("GOOGLE_OAUTH_REDIRECT_URI")
-    );
-
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-
-    const oauth2 = google.oauth2({ auth: oauth2Client, version: "v2" });
-    const userInfo = await oauth2.userinfo.get();
-
-    const { email, name, picture } = userInfo.data;
+    const { email, name, picture } = await this.googleOAuthProcess(code);
 
     const user = await this.usersService.findAndCreate({
       email: email!,
@@ -63,8 +77,33 @@ export class AuthService {
     });
 
     const accessToken = await this.issueAccessToken(user);
-    const refreshToken = await this.issueRefreshToken(user, userAgent);
+    const refreshToken = await this.issueRefreshToken(user, userAgent, SignupPlatform.GOOGLE);
 
     return { accessToken, refreshToken };
+  }
+
+  // Refresh Token Rotation
+  async reissueAccessToken(prevRefreshToken?: string) {
+    if (!prevRefreshToken) throw new UnauthorizedException("Refresh token is required");
+
+    const { jti }: { jti: string } = await this.jwtService.verifyAsync(prevRefreshToken);
+    const auth = await this.authRepository.findOne({ where: { id: jti }, relations: ["user"] });
+
+    if (!auth) throw new NotFoundException("Unknown user token");
+
+    const isInvalidAuth = auth.used || auth.invalid || auth.logout;
+    if (isInvalidAuth) throw new BadRequestException("Invalid refresh token");
+
+    const newAccessToken = await this.issueAccessToken(auth.user);
+    const newRefreshToken = await this.issueRefreshToken(auth.user, auth.userAgent, auth.platform);
+
+    await this.authRepository.update(jti, { used: true });
+
+    return { newAccessToken, newRefreshToken };
+  }
+
+  async signout(refreshToken: string) {
+    const { jti }: { jti: string } = this.jwtService.decode(refreshToken);
+    await this.authRepository.update(jti, { logout: true });
   }
 }

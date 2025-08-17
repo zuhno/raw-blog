@@ -1,11 +1,11 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
   UpdateDateColumn,
+  PrimaryColumn,
 } from "typeorm";
 
 import { SignupPlatform } from "../../../shared/utils/type";
@@ -13,7 +13,7 @@ import { User } from "../../users/entities/user.entity";
 
 @Entity("auth")
 export class Auth {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn("uuid")
   id!: string;
 
   @ManyToOne(() => User, {
@@ -29,15 +29,18 @@ export class Auth {
   @Column({ type: "bool", default: false })
   used?: boolean;
 
+  @Column({ type: "bool", default: false })
+  logout?: boolean;
+
+  @Column({ type: "bool", default: false })
+  invalid?: boolean;
+
   @Column({ type: "enum", enum: SignupPlatform })
   platform!: SignupPlatform;
 
-  @Column({ type: "timestamp", name: "expires_at" })
-  expiresAt!: Date;
-
-  @CreateDateColumn({ type: "timestamp", name: "issued_at" })
+  @CreateDateColumn({ type: "timestamptz", name: "issued_at" })
   issuedAt!: Date;
 
-  @UpdateDateColumn({ type: "timestamp", name: "updated_at" })
+  @UpdateDateColumn({ type: "timestamptz", name: "updated_at" })
   updatedAt!: Date;
 }

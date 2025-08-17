@@ -31,14 +31,10 @@ export class UserGuard implements CanActivate {
         secret: this.configService.get<string>("GOOGLE_SIGNIN_JWT_SECRET"),
       });
 
-      // 3) req.user에 주입
-      (req as any).user = payload;
-      (req as any).token = token;
+      req.user = payload;
 
       return true;
     } catch {
-      // 만료/서명 오류 등 모두 401로
-      // 만료시 쿠키에 담긴 리프레시토큰을 활용하여 엑세스토큰 재발급
       throw new UnauthorizedException("Invalid or expired token");
     }
   }

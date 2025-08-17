@@ -8,7 +8,6 @@ import { Repository } from "typeorm";
 
 import { AuthService } from "./auth.service";
 import { Auth } from "./entities/auth.entity";
-import { SignupPlatform } from "../../shared/utils/type";
 import { UsersService } from "../users/users.service";
 
 jest.mock("googleapis", () => {
@@ -68,7 +67,6 @@ const usersServiceMock = {
 
 describe("AuthService", () => {
   let service: AuthService;
-  let jwt: JwtServiceMock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -84,42 +82,11 @@ describe("AuthService", () => {
     }).compile();
 
     service = moduleRef.get(AuthService);
-    jwt = moduleRef.get(JwtService);
-  });
-
-  it("issueAccessToken: issued 15m token by user payload", async () => {
-    const token = await service.issueAccessToken({
-      id: userId,
-      email: "a@b.c",
-      nickname: "nick",
-    } as any);
-    expect(jwt.signAsync).toHaveBeenCalledWith(
-      expect.objectContaining({ id: userId, email: "a@b.c", nickname: "nick" }),
-      expect.objectContaining({ expiresIn: "15m" })
-    );
-    expect(token).toBe("access.token.mock");
-  });
-
-  it("issueRefreshToken: 7d RT with jti when after save session", async () => {
-    const token = await service.issueRefreshToken({ id: userId } as any, "UA");
-    expect(authRepoMock.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        platform: SignupPlatform.GOOGLE,
-        user: { id: userId },
-        userAgent: "UA",
-      })
-    );
-    expect(authRepoMock.save).toHaveBeenCalled();
-    expect(jwt.signAsync).toHaveBeenCalledWith(
-      expect.objectContaining({ jti: "session-uuid" }),
-      expect.objectContaining({ expiresIn: "7d" })
-    );
-    expect(token).toBe("refresh.token.mock");
   });
 
   it("googleExchange: exchange code → userinfo → upsert → issue AT/RT", async () => {
-    const { accessToken, refreshToken } = await service.googleExchange(
-      { code: "authcode-1234" } as any,
+    const { accessToken, refreshToken } = await service.exchangeGoogleCode(
+      { code: "authcode-1234" },
       "UA-STRING"
     );
 

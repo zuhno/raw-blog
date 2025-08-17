@@ -3,6 +3,8 @@ import cookieParser from "cookie-parser";
 
 import { AppModule } from "./app.module";
 import { ALLOWED_ORIGINS } from "./config/tokens";
+import { AllExceptionsFilter } from "./shared/filters/exceptions.filter";
+import { ResponseInterceptor } from "./shared/interceptors/response.interceptor";
 
 const PORT = process.env.PORT ?? 8080;
 
@@ -12,6 +14,8 @@ async function bootstrap() {
 
   app.enableCors({ origin: allowed, credentials: true });
   app.use(cookieParser());
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(PORT);
 }

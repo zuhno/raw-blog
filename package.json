@@ -26,6 +26,7 @@
     "*.{json,md,css,scss,yml,yaml}": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "@nestjs/mapped-types": "*",
     "axios": "^1.11.0",
     "es-toolkit": "^1.39.9"
   },

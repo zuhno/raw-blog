@@ -15,9 +15,14 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prepare": "ts-patch install"
   },
   "dependencies": {
+    "@nestia/core": "^7.3.3",
+    "@nestia/e2e": "^7.3.3",
+    "@nestia/fetcher": "^7.3.3",
+    "@nestia/sdk": "^7.3.3",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -31,9 +36,11 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.25",
+    "typia": "^9.7.1"
   },
   "devDependencies": {
+    "@nestia/benchmark": "^7.3.3",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
@@ -47,11 +54,14 @@
     "@types/supertest": "^6.0.2",
     "globals": "^16.0.0",
     "jest": "^30.0.0",
+    "nestia": "^7.3.3",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0"
+    "ts-patch": "^3.3.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "~5.9.2"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -1,3 +1,3 @@
 export class GoogleExchangeDto {
-  code: string;
+  code!: string;
 }

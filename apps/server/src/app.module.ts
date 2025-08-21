@@ -7,6 +7,7 @@ import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
 import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
+import { ContentsModule } from "./features/contents/contents.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from "./features/auth/auth.module";
 
     // API Module
     AuthModule,
+    ContentsModule,
 
     // Router
     RouterModule.register([
@@ -33,6 +35,10 @@ import { AuthModule } from "./features/auth/auth.module";
           {
             path: "auth",
             module: AuthModule,
+          },
+          {
+            path: "contents",
+            module: ContentsModule,
           },
         ],
       },

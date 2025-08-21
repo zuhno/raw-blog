@@ -1,3 +1,4 @@
+import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 
@@ -16,6 +17,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.listen(PORT);
 }

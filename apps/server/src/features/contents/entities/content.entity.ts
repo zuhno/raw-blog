@@ -6,17 +6,24 @@ import {
   JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
 
+import { User } from "../../../features/users/entities/user.entity";
 import { Tag } from "../../tags/entities/tag.entity";
 
-@Entity({ name: "content" })
+@Entity("content")
 export class Content {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column()
-  authorId!: number;
+  @ManyToOne(() => User, {
+    cascade: false,
+    nullable: false,
+  })
+  @JoinColumn({ name: "author_id", referencedColumnName: "id" })
+  author!: User;
 
   @Column({ type: "varchar" })
   title!: string;

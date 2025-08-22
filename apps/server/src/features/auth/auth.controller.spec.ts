@@ -55,7 +55,11 @@ describe("AuthController", () => {
     const dto = { code: "authcode-1234" };
     const res = createRes();
 
-    const result = await controller.exchangeGoogleCode(headers, dto, res as unknown as Response);
+    const result = await controller.exchangeGoogleCode(
+      headers,
+      dto,
+      res as unknown as Response
+    );
 
     expect(serviceMock.exchangeGoogleCode).toHaveBeenCalledWith(dto, "UA-TEST");
     expect(res.cookie).toHaveBeenCalledWith(

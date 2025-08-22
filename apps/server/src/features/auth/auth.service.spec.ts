@@ -16,7 +16,11 @@ jest.mock("googleapis", () => {
     .mockResolvedValue({ tokens: { access_token: "g_at", id_token: "g_id" } });
   const setCredentials = jest.fn();
   const userinfoGet = jest.fn().mockResolvedValue({
-    data: { email: "example@example.com", name: "example", picture: "https://img" },
+    data: {
+      email: "example@example.com",
+      name: "example",
+      picture: "https://img",
+    },
   });
 
   return {
@@ -92,7 +96,10 @@ describe("AuthService", () => {
 
     // googleapis 호출 검증
     expect(gMocks.getToken).toHaveBeenCalledWith("authcode-1234");
-    expect(gMocks.setCredentials).toHaveBeenCalledWith({ access_token: "g_at", id_token: "g_id" });
+    expect(gMocks.setCredentials).toHaveBeenCalledWith({
+      access_token: "g_at",
+      id_token: "g_id",
+    });
     expect(gMocks.userinfoGet).toHaveBeenCalled();
 
     // 유저 생성/조회

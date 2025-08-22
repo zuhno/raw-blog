@@ -8,29 +8,33 @@ import { User } from "./entities/user.entity";
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private readonly repo: Repository<User>
   ) {}
 
   async findAll() {
-    return this.userRepository.find();
+    return this.repo.find();
   }
 
   async findById(id: number) {
-    return this.userRepository.findOne({ where: { id } });
+    return this.repo.findOne({ where: { id } });
   }
 
   async findByEmail(email: string) {
-    return this.userRepository.findOne({ where: { email } });
+    return this.repo.findOne({ where: { email } });
   }
 
-  async findAndCreate(data: { email: string; nickname: string; avatarUrl?: string }) {
+  async findAndCreate(data: {
+    email: string;
+    nickname: string;
+    avatarUrl?: string;
+  }) {
     let user = await this.findByEmail(data.email);
 
     if (!user) {
-      const newUser = this.userRepository.create({
+      const newUser = this.repo.create({
         ...data,
       });
-      user = await this.userRepository.save(newUser);
+      user = await this.repo.save(newUser);
     }
 
     return user;

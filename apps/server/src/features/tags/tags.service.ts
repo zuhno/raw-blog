@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 
 import { CreateTagDto } from "./dto/create-tag.dto";
 import { CreateTagsDto } from "./dto/create-tags.dto";
@@ -10,37 +10,46 @@ import { Tag } from "./entities/tag.entity";
 export class TagsService {
   constructor(
     @InjectRepository(Tag)
-    private tagRepository: Repository<Tag>
+    private repo: Repository<Tag>
   ) {}
 
   async create(createTagDto: CreateTagDto) {
     const { name } = createTagDto;
 
-    const tagEntity = this.tagRepository.create({ name });
-    return this.tagRepository.save(tagEntity);
+    const tagEntity = this.repo.create({ name });
+    return this.repo.save(tagEntity);
   }
 
-  async bulkCreate(createTagsDto: CreateTagsDto) {
+  async createMany(createTagsDto: CreateTagsDto) {
     const { names } = createTagsDto;
     const newNames = names.map((name) => ({ name }));
 
-    const tagsEntities = this.tagRepository.create(newNames);
-    return this.tagRepository.save(tagsEntities);
+    const tagsEntities = this.repo.create(newNames);
+    return this.repo.save(tagsEntities);
   }
 
-  async search(name: string) {
-    return this.tagRepository.find({ where: { name: Like(`%${name}%`) } });
+  async searchByName(name: string) {
+    return this.repo.find({ where: { name: Like(`%${name}%`) } });
   }
 
-  findAll() {
-    return `This action returns all tags`;
+  async searchById(id: number) {
+    return this.repo.findOneBy({ id });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tag`;
-  }
+  async findAndCreateMany(tagNames: string[] = []) {
+    if (tagNames.length === 0) return [];
 
-  remove(id: number) {
-    return `This action removes a #${id} tag`;
+    const existingTags = await this.repo.findBy({ name: In(tagNames) });
+    const existingTagNames = existingTags.map((tag) => tag.name);
+    const newTagNames = tagNames.filter(
+      (name) => !existingTagNames.includes(name)
+    );
+
+    let newTags: Tag[] = [];
+    if (newTagNames.length > 0) {
+      newTags = await this.createMany({ names: newTagNames });
+    }
+
+    return [...existingTags, ...newTags];
   }
 }

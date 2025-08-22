@@ -8,7 +8,8 @@ import { ALLOWED_ORIGINS } from "../tokens";
   providers: [
     {
       provide: ALLOWED_ORIGINS,
-      useFactory: () => parseAllowedOriginsFromEnv(process.env.ALLOW_ACCESS_ORIGIN),
+      useFactory: () =>
+        parseAllowedOriginsFromEnv(process.env.ALLOW_ACCESS_ORIGIN),
     },
   ],
   exports: [ALLOWED_ORIGINS],

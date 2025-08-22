@@ -6,10 +6,12 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import eslintPluginImport from "eslint-plugin-import";
 
-const serverTypeChecked = tseslint.configs.recommendedTypeChecked.map((cfg) => ({
-  ...cfg,
-  files: ["apps/server/**/*.{ts,tsx}"],
-}));
+const serverTypeChecked = tseslint.configs.recommendedTypeChecked.map(
+  (cfg) => ({
+    ...cfg,
+    files: ["apps/server/**/*.{ts,tsx}"],
+  })
+);
 
 const clientRecommended = tseslint.configs.recommended.map((cfg) => ({
   ...cfg,
@@ -63,7 +65,12 @@ export default [
       "import/order": [
         "warn",
         {
-          groups: ["builtin", "external", "internal", ["parent", "sibling", "index"]],
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+          ],
           "newlines-between": "always",
           alphabetize: { order: "asc", caseInsensitive: true },
         },

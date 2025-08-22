@@ -25,7 +25,9 @@ export function parseAllowedOriginsFromEnv(raw?: string): string[] {
 }
 
 function normalizeOrigins(arr: unknown[]): string[] {
-  const out = arr.map((v) => (typeof v === "string" ? v.trim() : "")).filter(Boolean);
+  const out = arr
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .filter(Boolean);
 
   const unique = Array.from(new Set(out)).filter((o) => {
     try {

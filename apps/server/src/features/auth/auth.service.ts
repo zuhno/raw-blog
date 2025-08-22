@@ -20,7 +20,7 @@ import { UsersService } from "../users/users.service";
 export class AuthService {
   constructor(
     @InjectRepository(Auth)
-    private authRepository: Repository<Auth>,
+    private repo: Repository<Auth>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly usersService: UsersService
@@ -49,23 +49,32 @@ export class AuthService {
 
   private async issueAccessToken(user: User) {
     const payload = { ...user };
-    const token = await this.jwtService.signAsync(payload, { expiresIn: "15m" });
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: "15m",
+    });
     return token;
   }
 
-  private async issueRefreshToken(user: User, userAgent: string, platform: SignupPlatform) {
-    const newAuthSession = this.authRepository.create({
+  private async issueRefreshToken(
+    user: User,
+    userAgent: string,
+    platform: SignupPlatform
+  ) {
+    const newAuthSession = this.repo.create({
       user,
       userAgent,
       platform,
     });
-    const authSession = await this.authRepository.save(newAuthSession);
+    const authSession = await this.repo.save(newAuthSession);
     const payload = { jti: authSession.id };
     const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
     return token;
   }
 
-  async exchangeGoogleCode(googleExchangeDto: GoogleExchangeDto, userAgent: string) {
+  async exchangeGoogleCode(
+    googleExchangeDto: GoogleExchangeDto,
+    userAgent: string
+  ) {
     const { code } = googleExchangeDto;
 
     const { email, name, picture } = await this.googleOAuthProcess(code);
@@ -77,17 +86,26 @@ export class AuthService {
     });
 
     const accessToken = await this.issueAccessToken(user);
-    const refreshToken = await this.issueRefreshToken(user, userAgent, SignupPlatform.GOOGLE);
+    const refreshToken = await this.issueRefreshToken(
+      user,
+      userAgent,
+      SignupPlatform.GOOGLE
+    );
 
     return { accessToken, refreshToken };
   }
 
   // Refresh Token Rotation
   async reissueAccessToken(prevRefreshToken?: string) {
-    if (!prevRefreshToken) throw new UnauthorizedException("Refresh token is required");
+    if (!prevRefreshToken)
+      throw new UnauthorizedException("Refresh token is required");
 
-    const { jti }: { jti: string } = await this.jwtService.verifyAsync(prevRefreshToken);
-    const auth = await this.authRepository.findOne({ where: { id: jti }, relations: ["user"] });
+    const { jti }: { jti: string } =
+      await this.jwtService.verifyAsync(prevRefreshToken);
+    const auth = await this.repo.findOne({
+      where: { id: jti },
+      relations: ["user"],
+    });
 
     if (!auth) throw new NotFoundException("Unknown user token");
 
@@ -95,15 +113,19 @@ export class AuthService {
     if (isInvalidAuth) throw new BadRequestException("Invalid refresh token");
 
     const newAccessToken = await this.issueAccessToken(auth.user);
-    const newRefreshToken = await this.issueRefreshToken(auth.user, auth.userAgent, auth.platform);
+    const newRefreshToken = await this.issueRefreshToken(
+      auth.user,
+      auth.userAgent,
+      auth.platform
+    );
 
-    await this.authRepository.update(jti, { used: true });
+    await this.repo.update(jti, { used: true });
 
     return { newAccessToken, newRefreshToken };
   }
 
   async signout(refreshToken: string) {
     const { jti }: { jti: string } = this.jwtService.decode(refreshToken);
-    await this.authRepository.update(jti, { logout: true });
+    await this.repo.update(jti, { logout: true });
   }
 }

@@ -8,13 +8,15 @@ import { DatabaseService } from "./config/database/database.service";
 import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
 import { ContentsModule } from "./features/contents/contents.module";
+import { TagsModule } from "./features/tags/tags.module";
 
 @Module({
   imports: [
     // Config
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
+      envFilePath:
+        process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
     }),
     SecurityConfigModule,
     TypeOrmModule.forRootAsync({
@@ -26,6 +28,7 @@ import { ContentsModule } from "./features/contents/contents.module";
     // API Module
     AuthModule,
     ContentsModule,
+    TagsModule,
 
     // Router
     RouterModule.register([
@@ -39,6 +42,10 @@ import { ContentsModule } from "./features/contents/contents.module";
           {
             path: "contents",
             module: ContentsModule,
+          },
+          {
+            path: "tags",
+            module: TagsModule,
           },
         ],
       },

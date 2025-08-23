@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  RelationId,
 } from "typeorm";
 
 import { User } from "../../../features/users/entities/user.entity";
@@ -24,6 +25,9 @@ export class Content {
   })
   @JoinColumn({ name: "author_id", referencedColumnName: "id" })
   author!: User;
+
+  @RelationId((content: Content) => content.author)
+  authorId!: number;
 
   @Column({ type: "varchar" })
   title!: string;

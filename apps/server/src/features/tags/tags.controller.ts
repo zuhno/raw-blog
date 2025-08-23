@@ -7,7 +7,7 @@ export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Get(":name")
-  search(@Param("name") name: string) {
+  searchByName(@Param("name") name: string) {
     return this.tagsService.searchByName(name);
   }
 }

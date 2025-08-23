@@ -11,53 +11,54 @@ import {
 } from "@nestjs/common";
 
 import { ContentsService } from "./contents.service";
-import type { ListWithPublicQuery } from "./dto/content-list.dto";
+import type { ListQuery } from "./dto/content-list.dto";
 import type { CreateContentDto } from "./dto/create-content.dto";
-import type { DetailWithPublicParam } from "./dto/detail.dto";
 import type { UpdateContentDto } from "./dto/update-content.dto";
-import { ReqUser } from "../../shared/decorators/req-user.decorator";
+import { RequestUser } from "../../shared/decorators/request-user.decorator";
 import { RequireUser } from "../../shared/decorators/require-user.decorator";
-import type { RequestUser } from "../../shared/utils/type";
+import type { TRequestUser } from "../../shared/utils/type";
 
-@Controller("contents")
+@Controller()
 export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
   @Post()
   @RequireUser()
   create(
-    @ReqUser() user: RequestUser,
+    @RequestUser() user: TRequestUser,
     @Body() createContentDto: CreateContentDto
   ) {
     return this.contentsService.create(user.id, createContentDto);
   }
 
   @Get()
-  listWithPublic(@Query() query: ListWithPublicQuery) {
-    return this.contentsService.findManyPublicWithPagination(
+  list(@RequestUser() user: TRequestUser, @Query() query: ListQuery) {
+    const isMine = user?.id === query.authorId;
+    return this.contentsService.list(
       query.authorId,
       query.tagIds,
-      query.page,
-      query.pageSize,
-      query.total
+      query.offset,
+      query.limit,
+      query.sort,
+      isMine
     );
   }
 
   @Get(":id")
-  detailWithPublic(@Param() params: DetailWithPublicParam) {
-    return this.contentsService.findOneByIdWithPublic(params.id);
+  detail(
+    @RequestUser() user: TRequestUser,
+    @Param("id", ParseIntPipe) id: number
+  ) {
+    return this.contentsService.detail(id, user?.id);
   }
 
   @Patch(":id")
+  @RequireUser()
   update(
+    @RequestUser() user: TRequestUser,
     @Param("id", ParseIntPipe) id: number,
     @Body() updateContentDto: UpdateContentDto
   ) {
     return this.contentsService.update(id, updateContentDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id", ParseIntPipe) id: number) {
-    return this.contentsService.remove(id);
   }
 }

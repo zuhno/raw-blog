@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -7,6 +11,7 @@ import type { UpdateContentDto } from "./dto/update-content.dto";
 import { Content } from "./entities/content.entity";
 import { TagsService } from "../tags/tags.service";
 import { UsersService } from "../users/users.service";
+import { ESortType } from "./dto/content-list.dto";
 
 @Injectable()
 export class ContentsService {
@@ -16,6 +21,87 @@ export class ContentsService {
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService
   ) {}
+
+  getOrderType(sort: ESortType) {
+    return sort === ESortType.DESC ? "DESC" : "ASC";
+  }
+
+  async listQuery(
+    authorId: number,
+    offset: number,
+    limit: number,
+    sort: ESortType,
+    isMine: boolean
+  ) {
+    const query = this.repo
+      .createQueryBuilder("c")
+      .where("c.author_id = :authorId", { authorId })
+      .where("c.id > :offset", { offset });
+
+    if (!isMine) {
+      query.andWhere("c.publish = true").andWhere("c.private = false");
+    }
+
+    query
+      .orderBy("c.id", this.getOrderType(sort))
+      .limit(limit)
+      .select([
+        "c.id",
+        "c.title",
+        "c.publish",
+        "c.private",
+        "c.created_at",
+        "c.updated_at",
+        "c.author_id",
+      ]);
+
+    const contents = await query.getMany();
+    const nextOffset = contents.at(-1)?.id ?? null;
+    const hasNext = contents.length === limit;
+
+    return { contents, nextOffset, hasNext };
+  }
+
+  async listQueryByTags(
+    authorId: number,
+    tagIds: number[],
+    offset: number,
+    limit: number,
+    sort: ESortType,
+    isMine: boolean
+  ) {
+    const query = this.repo
+      .createQueryBuilder("c")
+      .innerJoin("content_tag", "ct", "ct.content_id = c.id")
+      .where("c.author_id = :authorId", { authorId });
+
+    if (!isMine) {
+      query.andWhere("c.publish = true").andWhere("c.private = false");
+    }
+
+    query
+      .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
+      .where("c.id > :offset", { offset })
+      .groupBy("c.id")
+      .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length })
+      .orderBy("c.id", this.getOrderType(sort))
+      .limit(limit)
+      .select([
+        "c.id",
+        "c.title",
+        "c.publish",
+        "c.private",
+        "c.created_at",
+        "c.updated_at",
+        "c.author_id",
+      ]);
+
+    const contents = await query.getMany();
+    const nextOffset = contents.at(-1)?.id ?? null;
+    const hasNext = contents.length === limit;
+
+    return { contents, nextOffset, hasNext };
+  }
 
   async create(authorId: number, createContentDto: CreateContentDto) {
     const {
@@ -43,111 +129,31 @@ export class ContentsService {
     return this.repo.save(content);
   }
 
-  async findManyPublicWithPagination(
+  async list(
     authorId: number,
     tagIds: number[],
-    page: number,
-    pageSize: number,
-    total: number
+    offset: number,
+    limit: number,
+    sort: ESortType,
+    isMine: boolean
   ) {
-    if (!tagIds.length) {
-      // If no tags, fall back to plain offset pagination quickly
-      const qb = this.repo
-        .createQueryBuilder("c")
-        .where("c.author_id = :authorId", { authorId })
-        .andWhere("c.publish = true")
-        .andWhere("c.private = false")
-        .orderBy("c.id", "DESC")
-        .skip((page - 1) * pageSize)
-        .take(pageSize)
-        .select([
-          "c.id",
-          "c.title",
-          "c.created_at",
-          "c.updated_at",
-          "c.author_id",
-        ]);
+    const withTag = tagIds.length >= 0;
 
-      const [items, total] = await Promise.all([qb.getMany(), qb.getCount()]);
-      return {
-        items,
-        meta: {
-          page,
-          pageSize,
-          total,
-          totalPages: Math.ceil(total / pageSize),
-          hasNext: page * pageSize < total,
-        },
-      };
-    }
-
-    // 1) Set of content.id satisfying tag AND (GROUP BY/HAVING)
-    const base = this.repo
-      .createQueryBuilder("c")
-      .innerJoin("content_tag", "ct", "ct.content_id = c.id")
-      .where("c.author_id = :authorId", { authorId })
-      .andWhere("c.publish = true")
-      .andWhere("c.private = false")
-      .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
-      .groupBy("c.id")
-      .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length }); // AND
-
-    // 2) Subquery to sort + OFFSET/LIMIT for pagination
-    const idsSub = this.repo
-      .createQueryBuilder()
-      .select("b.id", "id")
-      .from("(" + base.orderBy("c.id", "DESC").getQuery() + ")", "b")
-      .setParameters(base.getParameters())
-      .offset((page - 1) * pageSize) // OFFSET
-      .limit(pageSize); // LIMIT
-
-    // 3) Join to fetch actual content rows (single round-trip)
-    const items = await this.repo
-      .createQueryBuilder("content")
-      .innerJoin("(" + idsSub.getQuery() + ")", "ids", "ids.id = content.id")
-      .setParameters(idsSub.getParameters())
-      .orderBy("content.id", "DESC")
-      .select([
-        "content.id",
-        "content.title",
-        "content.created_at",
-        "content.updated_at",
-        "content.author_id",
-      ])
-      .getMany();
-
-    if (!total) {
-      // 4) Total count (use a separate COUNT query only if you need exact value)
-      const totalRow = await this.repo
-        .createQueryBuilder()
-        .select("COUNT(*)", "cnt")
-        .from("(" + base.getQuery() + ")", "x")
-        .setParameters(base.getParameters())
-        .getRawOne<{ cnt: string }>();
-
-      total = Number(totalRow?.cnt ?? 0);
-    }
-
-    return {
-      items,
-      meta: {
-        page,
-        pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
-        hasNext: page * pageSize < total,
-      },
-    };
+    if (!withTag) return this.listQuery(authorId, offset, limit, sort, isMine);
+    return this.listQueryByTags(authorId, tagIds, offset, limit, sort, isMine);
   }
 
-  async findOneByIdWithPublic(id: number) {
+  async detail(id: number, userId?: number) {
     const content = await this.repo.findOne({
-      where: { id, private: false, publish: true },
+      where: { id },
       relations: ["tags"],
     });
-    if (!content) {
-      throw new NotFoundException(`Content with ID ${id} not found`);
+    if (!content) throw new NotFoundException("Content not found");
+    if (!content.publish || content.private) {
+      if (content.authorId !== userId)
+        throw new UnauthorizedException("Do not have access to the content");
     }
+
     return content;
   }
 
@@ -171,12 +177,5 @@ export class ContentsService {
     }
 
     return this.repo.save(content);
-  }
-
-  async remove(id: number) {
-    const result = await this.repo.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Content with ID ${id} not found`);
-    }
   }
 }

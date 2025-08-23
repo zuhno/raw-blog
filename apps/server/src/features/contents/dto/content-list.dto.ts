@@ -1,7 +1,12 @@
 import { Type, Transform } from "class-transformer";
-import { IsArray, IsInt, IsOptional, Min } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsOptional, Min } from "class-validator";
 
-export class ListWithPublicQuery {
+export enum ESortType {
+  DESC,
+  ASC,
+}
+
+export class ListQuery {
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -27,16 +32,16 @@ export class ListWithPublicQuery {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  page: number = 1;
+  offset: number = 0;
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  pageSize: number = 20;
+  limit: number = 20;
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  total: number = 0;
+  @IsEnum(ESortType)
+  sort: ESortType = ESortType.DESC;
 }

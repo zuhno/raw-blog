@@ -19,13 +19,6 @@ export class Content {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @ManyToOne(() => User, {
-    cascade: false,
-    nullable: false,
-  })
-  @JoinColumn({ name: "author_id", referencedColumnName: "id" })
-  author!: User;
-
   @RelationId((content: Content) => content.author)
   authorId!: number;
 
@@ -46,6 +39,14 @@ export class Content {
 
   @UpdateDateColumn({ type: "timestamptz", name: "updated_at" })
   updatedAt!: Date;
+
+  // Relations
+  @ManyToOne(() => User, {
+    cascade: false,
+    nullable: false,
+  })
+  @JoinColumn({ name: "author_id", referencedColumnName: "id" })
+  author!: User;
 
   @ManyToMany(() => Tag, (tag) => tag.contents, {
     cascade: false,

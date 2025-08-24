@@ -1,5 +1,7 @@
 import type { User } from "../../features/users/entities/user.entity";
 
+export type Nullable<T> = T | null;
+
 export enum ESignupPlatform {
   GOOGLE = "GOOGLE",
   SLACK = "SLACK",
@@ -12,7 +14,7 @@ type ValidCookieKey = "refresh_token";
 
 declare module "express" {
   interface Request {
-    user?: TRequestUser;
+    user?: Nullable<TRequestUser>;
     cookies: { [key in ValidCookieKey]: string };
   }
 }

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -24,14 +23,12 @@ export class ContentsController {
 
   @Post()
   @RequireUser()
-  create(
-    @RequestUser() user: TRequestUser,
-    @Body() createContentDto: CreateContentDto
-  ) {
-    return this.contentsService.create(user.id, createContentDto);
+  create(@RequestUser() user: TRequestUser, @Body() body: CreateContentDto) {
+    return this.contentsService.create(user.id, body);
   }
 
   @Get()
+  @RequireUser({ strict: false })
   list(@RequestUser() user: TRequestUser, @Query() query: ListQuery) {
     const isMine = user?.id === query.authorId;
     return this.contentsService.list(
@@ -45,6 +42,7 @@ export class ContentsController {
   }
 
   @Get(":id")
+  @RequireUser({ strict: false })
   detail(
     @RequestUser() user: TRequestUser,
     @Param("id", ParseIntPipe) id: number
@@ -57,8 +55,8 @@ export class ContentsController {
   update(
     @RequestUser() user: TRequestUser,
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateContentDto: UpdateContentDto
+    @Body() body: UpdateContentDto
   ) {
-    return this.contentsService.update(id, updateContentDto);
+    return this.contentsService.update(id, user.id, body);
   }
 }

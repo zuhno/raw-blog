@@ -12,7 +12,7 @@ import { Repository } from "typeorm";
 
 import { GoogleExchangeDto } from "./dto/google-exchange.dto";
 import { Auth } from "./entities/auth.entity";
-import { SignupPlatform } from "../../shared/utils/type";
+import { ESignupPlatform } from "../../shared/utils/type";
 import type { User } from "../users/entities/user.entity";
 import { UsersService } from "../users/users.service";
 
@@ -58,7 +58,7 @@ export class AuthService {
   private async issueRefreshToken(
     user: User,
     userAgent: string,
-    platform: SignupPlatform
+    platform: ESignupPlatform
   ) {
     const newAuthSession = this.repo.create({
       user,
@@ -89,7 +89,7 @@ export class AuthService {
     const refreshToken = await this.issueRefreshToken(
       user,
       userAgent,
-      SignupPlatform.GOOGLE
+      ESignupPlatform.GOOGLE
     );
 
     return { accessToken, refreshToken };

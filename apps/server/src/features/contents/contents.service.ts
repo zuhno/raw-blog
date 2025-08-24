@@ -103,14 +103,8 @@ export class ContentsService {
     return { contents, nextOffset, hasNext };
   }
 
-  async create(authorId: number, createContentDto: CreateContentDto) {
-    const {
-      title,
-      body,
-      publish,
-      private: isPrivate,
-      tags: tagNames,
-    } = createContentDto;
+  async create(authorId: number, data: CreateContentDto) {
+    const { title, body, publish, private: isPrivate, tags: tagNames } = data;
 
     const user = await this.usersService.findById(authorId);
     if (!user) throw new NotFoundException("User not found");
@@ -143,14 +137,15 @@ export class ContentsService {
     return this.listQueryByTags(authorId, tagIds, offset, limit, sort, isMine);
   }
 
-  async detail(id: number, userId?: number) {
+  async detail(id: number, userId?: number, bypass?: boolean) {
     const content = await this.repo.findOne({
       where: { id },
       relations: ["tags"],
     });
+
     if (!content) throw new NotFoundException("Content not found");
     if (!content.publish || content.private) {
-      if (content.authorId !== userId)
+      if (!bypass && content.authorId !== userId)
         throw new UnauthorizedException("Do not have access to the content");
     }
 
@@ -159,18 +154,16 @@ export class ContentsService {
 
   async update(
     id: number,
-    updateContentDto: UpdateContentDto
+    userId: number,
+    data: UpdateContentDto
   ): Promise<Content> {
-    const { tags: tagNames, ...rest } = updateContentDto;
+    const { tags: tagNames, ...rest } = data;
 
-    const content = await this.repo.preload({
-      id,
-      ...rest,
-    });
+    const content = await this.repo.preload({ id, ...rest });
 
-    if (!content) {
-      throw new NotFoundException(`Content with ID ${id} not found`);
-    }
+    if (!content) throw new NotFoundException(`Content not found`);
+    if (content.authorId !== userId)
+      throw new UnauthorizedException("Do not have access to the content");
 
     if (tagNames) {
       content.tags = await this.tagsService.findAndCreateMany(tagNames);

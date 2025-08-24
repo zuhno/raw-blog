@@ -2,10 +2,16 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  mixin,
+  Type,
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import type { Request } from "express";
+
+export interface IUserGuardOptions {
+  strict: boolean;
+}
 
 function extractBearer(h?: string | null): string | null {
   if (!h) return null;
@@ -13,26 +19,40 @@ function extractBearer(h?: string | null): string | null {
   return t === "Bearer" && v ? v.trim() : null;
 }
 
-@Injectable()
-export class UserGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+export function UserGuard(opts?: IUserGuardOptions): Type<CanActivate> {
+  @Injectable()
+  class Guard implements CanActivate {
+    private isStrict = opts?.strict ?? true;
 
-  async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const req = ctx.switchToHttp().getRequest<Request>();
+    constructor(private readonly jwtService: JwtService) {}
 
-    const token = extractBearer(req.header("authorization"));
-    if (!token) {
-      throw new UnauthorizedException("Missing Authorization: Bearer <token>");
-    }
+    async canActivate(ctx: ExecutionContext): Promise<boolean> {
+      const req = ctx.switchToHttp().getRequest<Request>();
 
-    try {
-      const payload = await this.jwtService.verifyAsync(token);
+      const token = extractBearer(req.header("authorization"));
 
-      req.user = payload;
+      if (this.isStrict) {
+        if (!token) {
+          throw new UnauthorizedException(
+            "Missing Authorization: Bearer <token>"
+          );
+        }
+      }
 
-      return true;
-    } catch {
-      throw new UnauthorizedException("Invalid or expired token");
+      try {
+        const payload = await this.jwtService
+          .verifyAsync(token!)
+          .catch((err) => {
+            if (this.isStrict) throw err;
+            else return null;
+          });
+        req.user = payload;
+
+        return true;
+      } catch {
+        throw new UnauthorizedException("Invalid or expired token");
+      }
     }
   }
+  return mixin(Guard);
 }

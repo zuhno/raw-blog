@@ -7,6 +7,7 @@ import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
 import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
+import { CommentsModule } from "./features/comments/comments.module";
 import { ContentsModule } from "./features/contents/contents.module";
 import { TagsModule } from "./features/tags/tags.module";
 
@@ -29,6 +30,7 @@ import { TagsModule } from "./features/tags/tags.module";
     AuthModule,
     ContentsModule,
     TagsModule,
+    CommentsModule,
 
     // Router
     RouterModule.register([
@@ -46,6 +48,10 @@ import { TagsModule } from "./features/tags/tags.module";
           {
             path: "tags",
             module: TagsModule,
+          },
+          {
+            path: "comments",
+            module: CommentsModule,
           },
         ],
       },

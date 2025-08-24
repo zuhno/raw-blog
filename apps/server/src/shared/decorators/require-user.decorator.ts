@@ -1,7 +1,10 @@
 import { applyDecorators, UseGuards } from "@nestjs/common";
 
-import { UserGuard } from "../guards/user.guard";
+import { type IUserGuardOptions, UserGuard } from "../guards/user.guard";
 
-export function RequireUser() {
-  return applyDecorators(UseGuards(UserGuard));
+/**
+ * @param opts.strict activate throw an error. default true
+ */
+export function RequireUser(opts?: IUserGuardOptions) {
+  return applyDecorators(UseGuards(UserGuard(opts)));
 }

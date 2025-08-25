@@ -12,7 +12,10 @@ import {
 } from "typeorm";
 
 import { User } from "../../../features/users/entities/user.entity";
+import { EContentType } from "../../../shared/utils/type";
 import { Tag } from "../../tags/entities/tag.entity";
+
+export enum a {}
 
 @Entity("content")
 export class Content {
@@ -33,6 +36,9 @@ export class Content {
 
   @Column({ type: "boolean", default: false })
   private!: boolean;
+
+  @Column({ type: "enum", enum: EContentType })
+  type!: EContentType;
 
   @CreateDateColumn({ type: "timestamptz", name: "created_at" })
   createdAt!: Date;

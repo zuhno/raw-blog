@@ -9,6 +9,11 @@ export enum ESignupPlatform {
   KAKAO = "KAKAO",
 }
 
+export enum EContentType {
+  POST = "POST",
+  DAILY = "DAILY",
+}
+
 export type TRequestUser = Omit<User, "createdAt" | "updatedAt">;
 type ValidCookieKey = "refresh_token";
 

@@ -12,6 +12,7 @@ import { Content } from "./entities/content.entity";
 import { TagsService } from "../tags/tags.service";
 import { UsersService } from "../users/users.service";
 import { ESortType } from "./dto/content-list.dto";
+import { EContentType } from "../../shared/utils/type";
 
 @Injectable()
 export class ContentsService {
@@ -25,70 +26,86 @@ export class ContentsService {
   getOrderType(sort: ESortType) {
     return sort === ESortType.DESC ? "DESC" : "ASC";
   }
+  getIdOpType(sort: ESortType) {
+    return sort === ESortType.ASC ? ">" : "<";
+  }
 
   async listQuery(
     authorId: number,
+    type: EContentType,
     offset: number,
     limit: number,
     sort: ESortType,
     isMine: boolean
   ) {
+    const order = this.getOrderType(sort);
+    const op = this.getIdOpType(sort);
+
     const query = this.repo
       .createQueryBuilder("c")
       .where("c.author_id = :authorId", { authorId })
-      .where("c.id > :offset", { offset });
+      .andWhere("c.type = :type", { type })
+      .andWhere(`c.id ${op} :offset`, { offset });
 
     if (!isMine) {
       query.andWhere("c.publish = true").andWhere("c.private = false");
     }
 
     query
-      .orderBy("c.id", this.getOrderType(sort))
-      .limit(limit)
+      .orderBy("c.id", order)
+      .limit(limit + 1)
       .select([
         "c.id",
         "c.title",
         "c.publish",
         "c.private",
+        "c.type",
         "c.created_at",
         "c.updated_at",
         "c.author_id",
       ]);
 
-    const contents = await query.getMany();
+    const rows = await query.getMany();
+    const hasNext = rows.length > limit;
+    const contents = hasNext ? rows.slice(0, limit) : rows;
     const nextOffset = contents.at(-1)?.id ?? null;
-    const hasNext = contents.length === limit;
 
     return { contents, nextOffset, hasNext };
   }
 
   async listQueryByTags(
     authorId: number,
+    type: EContentType,
     tagIds: number[],
     offset: number,
     limit: number,
     sort: ESortType,
     isMine: boolean
   ) {
+    const order = this.getOrderType(sort);
+    const op = this.getIdOpType(sort);
+
     const query = this.repo
       .createQueryBuilder("c")
       .innerJoin("content_tag", "ct", "ct.content_id = c.id")
-      .where("c.author_id = :authorId", { authorId });
+      .where("c.author_id = :authorId", { authorId })
+      .andWhere("c.type = :type", { type })
+      .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
+      .andWhere(`c.id ${op} :offset`, { offset });
 
     if (!isMine) {
       query.andWhere("c.publish = true").andWhere("c.private = false");
     }
 
     query
-      .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
-      .where("c.id > :offset", { offset })
       .groupBy("c.id")
       .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length })
-      .orderBy("c.id", this.getOrderType(sort))
-      .limit(limit)
+      .orderBy("c.id", order)
+      .limit(limit + 1)
       .select([
         "c.id",
         "c.title",
+        "c.type",
         "c.publish",
         "c.private",
         "c.created_at",
@@ -96,15 +113,23 @@ export class ContentsService {
         "c.author_id",
       ]);
 
-    const contents = await query.getMany();
+    const rows = await query.getMany();
+    const hasNext = rows.length > limit;
+    const contents = hasNext ? rows.slice(0, limit) : rows;
     const nextOffset = contents.at(-1)?.id ?? null;
-    const hasNext = contents.length === limit;
 
     return { contents, nextOffset, hasNext };
   }
 
   async create(authorId: number, data: CreateContentDto) {
-    const { title, body, publish, private: isPrivate, tags: tagNames } = data;
+    const {
+      title,
+      body,
+      type,
+      publish,
+      private: isPrivate,
+      tags: tagNames,
+    } = data;
 
     const user = await this.usersService.findById(authorId);
     if (!user) throw new NotFoundException("User not found");
@@ -114,6 +139,7 @@ export class ContentsService {
     const content = this.repo.create({
       title,
       body,
+      type,
       publish,
       private: isPrivate,
       author: user,
@@ -125,6 +151,7 @@ export class ContentsService {
 
   async list(
     authorId: number,
+    type: EContentType,
     tagIds: number[],
     offset: number,
     limit: number,
@@ -133,8 +160,17 @@ export class ContentsService {
   ) {
     const withTag = tagIds.length >= 0;
 
-    if (!withTag) return this.listQuery(authorId, offset, limit, sort, isMine);
-    return this.listQueryByTags(authorId, tagIds, offset, limit, sort, isMine);
+    if (!withTag)
+      return this.listQuery(authorId, type, offset, limit, sort, isMine);
+    return this.listQueryByTags(
+      authorId,
+      type,
+      tagIds,
+      offset,
+      limit,
+      sort,
+      isMine
+    );
   }
 
   async detail(id: number, userId?: number, bypass?: boolean) {

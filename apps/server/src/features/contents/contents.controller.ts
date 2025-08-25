@@ -33,6 +33,7 @@ export class ContentsController {
     const isMine = user?.id === query.authorId;
     return this.contentsService.list(
       query.authorId,
+      query.type,
       query.tagIds,
       query.offset,
       query.limit,

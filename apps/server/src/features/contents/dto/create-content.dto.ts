@@ -1,4 +1,14 @@
-import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from "class-validator";
+
+import { EContentType } from "../../../shared/utils/type";
 
 export class CreateContentDto {
   @IsString()
@@ -10,6 +20,10 @@ export class CreateContentDto {
   @IsNotEmpty()
   @MinLength(1)
   body!: string;
+
+  @IsEnum(EContentType)
+  @IsNotEmpty()
+  type!: EContentType;
 
   @IsBoolean()
   @IsOptional()

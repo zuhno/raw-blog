@@ -1,4 +1,13 @@
-import { IsArray, IsBoolean, IsOptional, IsString, MinLength } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MinLength,
+} from "class-validator";
+
+import { EContentType } from "../../../shared/utils/type";
 
 export class UpdateContentDto {
   @IsString()
@@ -10,6 +19,10 @@ export class UpdateContentDto {
   @MinLength(1)
   @IsOptional()
   body?: string;
+
+  @IsEnum(EContentType)
+  @IsOptional()
+  type?: EContentType;
 
   @IsBoolean()
   @IsOptional()

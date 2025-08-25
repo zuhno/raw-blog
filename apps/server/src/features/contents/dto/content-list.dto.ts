@@ -1,5 +1,6 @@
 import { Type, Transform } from "class-transformer";
 import { IsArray, IsEnum, IsInt, IsOptional, Min } from "class-validator";
+import { EContentType } from "src/shared/utils/type";
 
 export enum ESortType {
   DESC,
@@ -27,6 +28,10 @@ export class ListQuery {
   })
   @IsArray()
   tagIds: number[] = [];
+
+  @Type(() => String)
+  @IsEnum(EContentType)
+  type!: EContentType;
 
   @IsOptional()
   @Type(() => Number)

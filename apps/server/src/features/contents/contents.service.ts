@@ -31,35 +31,27 @@ export class ContentsService {
   }
 
   async listQuery(
-    authorId: number,
     type: EContentType,
     offset: number,
     limit: number,
-    sort: ESortType,
-    isMine: boolean
+    sort: ESortType
   ) {
     const order = this.getOrderType(sort);
     const op = this.getIdOpType(sort);
 
     const query = this.repo
       .createQueryBuilder("c")
-      .where("c.author_id = :authorId", { authorId })
-      .andWhere("c.type = :type", { type })
-      .andWhere(`c.id ${op} :offset`, { offset });
-
-    if (!isMine) {
-      query.andWhere("c.publish = true").andWhere("c.private = false");
-    }
-
-    query
+      .where("c.type = :type", { type })
+      .andWhere(`c.id ${op} :offset`, { offset })
+      .andWhere("c.publish = true")
       .orderBy("c.id", order)
       .limit(limit + 1)
       .select([
         "c.id",
         "c.title",
+        "c.type",
         "c.publish",
         "c.private",
-        "c.type",
         "c.created_at",
         "c.updated_at",
         "c.author_id",
@@ -74,13 +66,11 @@ export class ContentsService {
   }
 
   async listQueryByTags(
-    authorId: number,
     type: EContentType,
     tagIds: number[],
     offset: number,
     limit: number,
-    sort: ESortType,
-    isMine: boolean
+    sort: ESortType
   ) {
     const order = this.getOrderType(sort);
     const op = this.getIdOpType(sort);
@@ -88,16 +78,10 @@ export class ContentsService {
     const query = this.repo
       .createQueryBuilder("c")
       .innerJoin("content_tag", "ct", "ct.content_id = c.id")
-      .where("c.author_id = :authorId", { authorId })
-      .andWhere("c.type = :type", { type })
+      .where("c.type = :type", { type })
       .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
-      .andWhere(`c.id ${op} :offset`, { offset });
-
-    if (!isMine) {
-      query.andWhere("c.publish = true").andWhere("c.private = false");
-    }
-
-    query
+      .andWhere(`c.id ${op} :offset`, { offset })
+      .andWhere("c.publish = true")
       .groupBy("c.id")
       .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length })
       .orderBy("c.id", order)
@@ -150,27 +134,16 @@ export class ContentsService {
   }
 
   async list(
-    authorId: number,
     type: EContentType,
     tagIds: number[],
     offset: number,
     limit: number,
-    sort: ESortType,
-    isMine: boolean
+    sort: ESortType
   ) {
     const withTag = tagIds.length >= 0;
 
-    if (!withTag)
-      return this.listQuery(authorId, type, offset, limit, sort, isMine);
-    return this.listQueryByTags(
-      authorId,
-      type,
-      tagIds,
-      offset,
-      limit,
-      sort,
-      isMine
-    );
+    if (!withTag) return this.listQuery(type, offset, limit, sort);
+    return this.listQueryByTags(type, tagIds, offset, limit, sort);
   }
 
   async detail(id: number, userId?: number, bypass?: boolean) {

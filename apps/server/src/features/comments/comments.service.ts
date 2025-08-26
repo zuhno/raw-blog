@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -35,6 +36,8 @@ export class CommentsService {
       true
     );
     if (!content) throw new NotFoundException("Content not found");
+    if (!content.publish || content.private)
+      throw new BadRequestException("Do not have access to the content");
 
     let parent: Nullable<Comment> = null;
     if (parentId) {

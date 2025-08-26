@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tanstack/react-router": "^1.131.27",
+    "@tanstack/react-router-devtools": "^1.131.27",
     "@tiptap/extension-text-style": "^3.1.0",
     "@tiptap/react": "^3.1.0",
     "@tiptap/starter-kit": "^3.1.0",
@@ -19,6 +20,7 @@
     "tiptap-extension-resizable-image": "^2.0.0"
   },
   "devDependencies": {
+    "@tanstack/router-plugin": "^1.131.27",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^4.7.0",

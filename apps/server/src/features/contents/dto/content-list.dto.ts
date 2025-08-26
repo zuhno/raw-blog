@@ -8,11 +8,6 @@ export enum ESortType {
 }
 
 export class ListQuery {
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  authorId!: number;
-
   @IsOptional()
   @Transform(({ value }) => {
     if (Array.isArray(value)) {

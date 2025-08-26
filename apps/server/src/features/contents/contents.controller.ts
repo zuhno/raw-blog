@@ -30,15 +30,12 @@ export class ContentsController {
   @Get()
   @RequireUser({ strict: false })
   list(@RequestUser() user: TRequestUser, @Query() query: ListQuery) {
-    const isMine = user?.id === query.authorId;
     return this.contentsService.list(
-      query.authorId,
       query.type,
       query.tagIds,
       query.offset,
       query.limit,
-      query.sort,
-      isMine
+      query.sort
     );
   }
 

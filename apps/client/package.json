@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/query-core": "^5.85.5",
     "@tanstack/react-router": "^1.131.27",
     "@tanstack/react-router-devtools": "^1.131.27",
     "@tiptap/extension-text-style": "^3.1.0",
     "@tiptap/react": "^3.1.0",
     "@tiptap/starter-kit": "^3.1.0",
+    "jotai": "^2.13.1",
+    "jotai-tanstack-query": "^0.11.0",
+    "ky": "^1.9.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tiptap-extension-resizable-image": "^2.0.0"

@@ -1,4 +1,6 @@
-import { Link, Outlet } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
+
+import Navigation from "./Navigation";
 
 const RootLayout = () => {
   return (
@@ -9,16 +11,7 @@ const RootLayout = () => {
           paddingBottom: 0,
         }}
       >
-        <nav style={{ marginBottom: 0 }}>
-          <ul>
-            <li>
-              <Link to="/">Post</Link>
-            </li>
-            <li>
-              <Link to="/daily">Daily</Link>
-            </li>
-          </ul>
-        </nav>
+        <Navigation />
       </header>
       <main>
         <Outlet />

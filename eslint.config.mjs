@@ -89,10 +89,24 @@ export default [
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      import: eslintPluginImport,
     },
     rules: {
       ...(reactHooks.configs["recommended-latest"]?.rules ?? {}),
       ...(reactRefresh.configs.vite?.rules ?? {}),
+      "import/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+          ],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
     },
   },
 ];

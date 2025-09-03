@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
+import { JwtCoreModule } from "./config/jwt/jwt-core.module";
 import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
 import { CommentsModule } from "./features/comments/comments.module";
@@ -19,6 +20,7 @@ import { TagsModule } from "./features/tags/tags.module";
       envFilePath:
         process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev",
     }),
+    JwtCoreModule,
     SecurityConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [DatabaseModule],

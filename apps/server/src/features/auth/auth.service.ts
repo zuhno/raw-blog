@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
@@ -49,9 +48,11 @@ export class AuthService {
 
   private async issueAccessToken(user: User) {
     const payload = { ...user };
-    const token = await this.jwtService.signAsync(payload, {
-      expiresIn: "15m",
-    });
+    const token = await this.jwtService
+      .signAsync(payload, {
+        expiresIn: "15m",
+      })
+      .catch((err) => console.log(err));
     return token;
   }
 
@@ -67,7 +68,9 @@ export class AuthService {
     });
     const authSession = await this.repo.save(newAuthSession);
     const payload = { jti: authSession.id };
-    const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: "10s",
+    });
     return token;
   }
 
@@ -97,8 +100,9 @@ export class AuthService {
 
   // Refresh Token Rotation
   async reissueAccessToken(prevRefreshToken?: string) {
-    if (!prevRefreshToken)
-      throw new UnauthorizedException("Refresh token is required");
+    if (!prevRefreshToken) {
+      throw new BadRequestException("Refresh token is required");
+    }
 
     const { jti }: { jti: string } =
       await this.jwtService.verifyAsync(prevRefreshToken);

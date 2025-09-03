@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Delete,
   Query,
 } from "@nestjs/common";
 
@@ -56,5 +57,14 @@ export class ContentsController {
     @Body() body: UpdateContentDto
   ) {
     return this.contentsService.update(id, user.id, body);
+  }
+
+  @Delete(":id")
+  @RequireUser()
+  delete(
+    @RequestUser() user: TRequestUser,
+    @Param("id", ParseIntPipe) id: number
+  ) {
+    return this.contentsService.delete(id, user.id);
   }
 }

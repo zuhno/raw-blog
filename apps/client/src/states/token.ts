@@ -1,19 +1,29 @@
 type AccessToken = string | null;
+type Listener = () => void;
 
 class TokenStore {
-  private accessToken: AccessToken = null;
+  private token: AccessToken = null;
+  private listeners = new Set<Listener>();
 
-  get() {
-    return this.accessToken;
+  private emit() {
+    for (const listener of this.listeners) listener();
   }
-  set(token: string) {
-    this.accessToken = token;
-    // 필요하다면 localStorage 연동:
-    // localStorage.setItem("access_token", token);
+
+  getSnapshot = () => this.token;
+
+  subscribe = (listener: Listener) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+
+  set(token: AccessToken) {
+    this.token = token;
+    this.emit();
   }
+
   clear() {
-    this.accessToken = null;
-    // localStorage.removeItem("access_token");
+    this.set(null);
   }
 }
+
 export const tokenStore = new TokenStore();

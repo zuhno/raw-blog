@@ -18,7 +18,7 @@ export const authApi = {
   },
   postTokenRefresh: () => {
     const { request, path } = endpoints.auth.tokenRefresh();
-    return request<{ accessToken: string }>(path);
+    return request(path);
   },
   postSignout: () => {
     const { request, path } = endpoints.auth.signout();

@@ -25,6 +25,7 @@ export class Tag {
   @UpdateDateColumn({ type: "timestamptz", name: "updated_at" })
   updatedAt!: Date;
 
+  // Relations
   @ManyToMany(() => Content, (content) => content.tags)
   contents!: Content[];
 }

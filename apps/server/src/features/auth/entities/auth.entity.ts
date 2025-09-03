@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   UpdateDateColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { ESignupPlatform } from "../../../shared/utils/type";
@@ -13,7 +13,7 @@ import { User } from "../../users/entities/user.entity";
 
 @Entity("auth")
 export class Auth {
-  @PrimaryColumn("uuid")
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column({ type: "varchar", name: "user_agent" })

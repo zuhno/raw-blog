@@ -47,6 +47,7 @@ export class Comment {
   @ManyToOne(() => Content, {
     cascade: false,
     nullable: false,
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "content_id", referencedColumnName: "id" })
   content!: Content;
@@ -54,6 +55,7 @@ export class Comment {
   @ManyToOne(() => Comment, (comment) => comment.children, {
     nullable: true,
     cascade: false,
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "parent_id", referencedColumnName: "id" })
   parent?: Comment;

@@ -62,6 +62,7 @@ export default [
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
       "import/order": [
         "warn",
         {
@@ -94,6 +95,8 @@ export default [
     rules: {
       ...(reactHooks.configs["recommended-latest"]?.rules ?? {}),
       ...(reactRefresh.configs.vite?.rules ?? {}),
+      "@typescript-eslint/no-empty-object-type": "off",
+      "react-refresh/only-export-components": "off",
       "import/order": [
         "warn",
         {

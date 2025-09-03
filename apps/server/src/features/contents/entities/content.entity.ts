@@ -60,7 +60,10 @@ export class Content {
   })
   @JoinTable({
     name: "content_tag",
-    joinColumn: { name: "content_id", referencedColumnName: "id" },
+    joinColumn: {
+      name: "content_id",
+      referencedColumnName: "id",
+    },
     inverseJoinColumn: { name: "tag_id", referencedColumnName: "id" },
   })
   tags!: Tag[];

@@ -7,9 +7,7 @@ type RetryGuardOptions = Options & { _retriedOnce?: boolean };
 
 const api = ky.create({
   prefixUrl: import.meta.env.VITE_SERVER_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  credentials: "include",
   retry: {
     limit: 0,
   },
@@ -18,7 +16,7 @@ const api = ky.create({
       async (request) => {
         await authManager.waitIfRefreshing();
 
-        const token = tokenStore.get();
+        const token = tokenStore.getSnapshot();
         if (token) {
           request.headers.set("Authorization", `Bearer ${token}`);
         }
@@ -28,8 +26,7 @@ const api = ky.create({
       async (request, options, response) => {
         if (response.ok) return response;
 
-        const isAuthExpired =
-          response.status === 401 || response.status === 419;
+        const isAuthExpired = response.status === 401;
         if (!isAuthExpired) return response;
 
         const typed = options as RetryGuardOptions;
@@ -40,7 +37,10 @@ const api = ky.create({
         try {
           await authManager.ensureRefreshed(async () => {
             const res = await fetch(
-              new URL("/auth/refresh", import.meta.env.VITE_SERVER_API_URL),
+              new URL(
+                "auth/refresh",
+                import.meta.env.VITE_SERVER_API_URL + "/"
+              ),
               {
                 method: "POST",
                 credentials: "include",
@@ -51,6 +51,7 @@ const api = ky.create({
               throw new Error(`Refresh failed with ${res.status}`);
             }
             const resJson = (await res.json()) as {
+              success: boolean;
               data: { accessToken: string };
             };
             if (!resJson?.data?.accessToken)
@@ -80,10 +81,19 @@ export type JsonValue =
   | boolean
   | null;
 
-interface ICommonRespType<T> {
-  success: boolean;
-  data: T;
-}
+type HttpErrorBody =
+  | string
+  | {
+      statusCode?: number;
+      message?: string | string[];
+      error?: string;
+      code?: string;
+      [key: string]: unknown;
+    };
+
+type Ok<T> = { success: true; data: T; error?: never };
+type Err = { success: false; error: HttpErrorBody; data?: never };
+type ICommonRespType<T> = Ok<T> | Err;
 
 export const http = {
   get: async <T>(url: string, opts?: Options) => {

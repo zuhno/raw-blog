@@ -1,10 +1,10 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 
 import type { CreateContentDto } from "./dto/create-content.dto";
 import type { UpdateContentDto } from "./dto/update-content.dto";
@@ -20,7 +20,8 @@ export class ContentsService {
     @InjectRepository(Content)
     private readonly repo: Repository<Content>,
     private readonly usersService: UsersService,
-    private readonly tagsService: TagsService
+    private readonly tagsService: TagsService,
+    private readonly dataSource: DataSource
   ) {}
 
   getOrderType(sort: ESortType) {
@@ -155,29 +156,46 @@ export class ContentsService {
     if (!content) throw new NotFoundException("Content not found");
     if (!content.publish || content.private) {
       if (!bypass && content.authorId !== userId)
-        throw new UnauthorizedException("Do not have access to the content");
+        throw new ForbiddenException("Do not have access to the content");
     }
 
     return content;
   }
 
-  async update(
-    id: number,
-    userId: number,
-    data: UpdateContentDto
-  ): Promise<Content> {
+  async update(id: number, userId: number, data: UpdateContentDto) {
     const { tags: tagNames, ...rest } = data;
 
     const content = await this.repo.preload({ id, ...rest });
 
-    if (!content) throw new NotFoundException(`Content not found`);
+    if (!content) throw new NotFoundException("Content not found");
     if (content.authorId !== userId)
-      throw new UnauthorizedException("Do not have access to the content");
+      throw new ForbiddenException("Do not have access to the content");
 
     if (tagNames) {
       content.tags = await this.tagsService.findAndCreateMany(tagNames);
     }
 
     return this.repo.save(content);
+  }
+
+  async delete(id: number, userId: number) {
+    await this.dataSource.transaction(async (tm) => {
+      const raw = await tm
+        .createQueryBuilder()
+        .select("c.author_id", "authorId")
+        .from(Content, "c")
+        .where("c.id = :id", { id })
+        .getRawOne<{ authorId: number }>();
+
+      if (!raw) throw new NotFoundException("Content not found");
+      if (raw.authorId !== userId) {
+        throw new ForbiddenException("Do not have access to the content");
+      }
+
+      await tm.createQueryBuilder().relation(Content, "tags").of(id).set([]);
+
+      const result = await tm.delete(Content, { id });
+      if (!result.affected) throw new NotFoundException("Content not found");
+    });
   }
 }

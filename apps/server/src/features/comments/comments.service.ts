@@ -1,8 +1,7 @@
 import {
-  BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -37,7 +36,7 @@ export class CommentsService {
     );
     if (!content) throw new NotFoundException("Content not found");
     if (!content.publish || content.private)
-      throw new BadRequestException("Do not have access to the content");
+      throw new ForbiddenException("Do not have access to the content");
 
     let parent: Nullable<Comment> = null;
     if (parentId) {
@@ -112,7 +111,7 @@ export class CommentsService {
 
     if (!comment) throw new NotFoundException("Comment not found");
     if (comment.authorId !== userId) {
-      throw new UnauthorizedException("Do not have access to the comment");
+      throw new ForbiddenException("Do not have access to the comment");
     }
 
     return this.repo.save(comment);
@@ -123,7 +122,7 @@ export class CommentsService {
 
     if (!comment) throw new NotFoundException("Comment not found");
     if (comment.authorId !== userId) {
-      throw new UnauthorizedException("Do not have access to the comment");
+      throw new ForbiddenException("Do not have access to the comment");
     }
 
     await this.repo.remove(comment);

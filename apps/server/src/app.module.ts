@@ -11,6 +11,7 @@ import { AuthModule } from "./features/auth/auth.module";
 import { CommentsModule } from "./features/comments/comments.module";
 import { ContentsModule } from "./features/contents/contents.module";
 import { TagsModule } from "./features/tags/tags.module";
+import { UsersModule } from "./features/users/users.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TagsModule } from "./features/tags/tags.module";
     ContentsModule,
     TagsModule,
     CommentsModule,
+    UsersModule,
 
     // Router
     RouterModule.register([
@@ -54,6 +56,10 @@ import { TagsModule } from "./features/tags/tags.module";
           {
             path: "comments",
             module: CommentsModule,
+          },
+          {
+            path: "users",
+            module: UsersModule,
           },
         ],
       },

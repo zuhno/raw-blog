@@ -68,9 +68,7 @@ export class AuthService {
     });
     const authSession = await this.repo.save(newAuthSession);
     const payload = { jti: authSession.id };
-    const token = await this.jwtService.signAsync(payload, {
-      expiresIn: "10s",
-    });
+    const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
     return token;
   }
 

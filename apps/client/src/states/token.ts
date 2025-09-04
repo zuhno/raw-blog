@@ -1,24 +1,16 @@
-type AccessToken = string | null;
-type Listener = () => void;
+import BaseStore from "./base";
+import type { Nullable } from "../shared/utils/type";
 
-class TokenStore {
-  private token: AccessToken = null;
-  private listeners = new Set<Listener>();
+export type TAccessToken = Nullable<string>;
 
-  private emit() {
-    for (const listener of this.listeners) listener();
-  }
+class TokenStore extends BaseStore<TAccessToken> {
+  private token: TAccessToken = null;
 
   getSnapshot = () => this.token;
 
-  subscribe = (listener: Listener) => {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  };
-
-  set(token: AccessToken) {
+  set(token: TAccessToken) {
     this.token = token;
-    this.emit();
+    super.emit();
   }
 
   clear() {

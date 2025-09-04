@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 
-import { tokenStore } from "../../states/token";
+import { tokenStore, type TAccessToken } from "../../states/token";
 
 const useAccessToken = () => {
   const token = useSyncExternalStore(
@@ -8,7 +8,7 @@ const useAccessToken = () => {
     tokenStore.getSnapshot
   );
   const setToken = useCallback(
-    (newToken: string) => tokenStore.set(newToken),
+    (newToken: TAccessToken) => tokenStore.set(newToken),
     []
   );
   const clearToken = useCallback(() => tokenStore.clear(), []);

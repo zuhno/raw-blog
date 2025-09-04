@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
+import { Route as MeRouteImport } from "./routes/me";
 import { Route as DailyRouteImport } from "./routes/daily";
 import { Route as IndexRouteImport } from "./routes/index";
 
+const MeRoute = MeRouteImport.update({
+  id: "/me",
+  path: "/me",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DailyRoute = DailyRouteImport.update({
   id: "/daily",
   path: "/daily",
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/daily": typeof DailyRoute;
+  "/me": typeof MeRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/daily": typeof DailyRoute;
+  "/me": typeof MeRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/daily": typeof DailyRoute;
+  "/me": typeof MeRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/daily";
+  fullPaths: "/" | "/daily" | "/me";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/daily";
-  id: "__root__" | "/" | "/daily";
+  to: "/" | "/daily" | "/me";
+  id: "__root__" | "/" | "/daily" | "/me";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   DailyRoute: typeof DailyRoute;
+  MeRoute: typeof MeRoute;
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/me": {
+      id: "/me";
+      path: "/me";
+      fullPath: "/me";
+      preLoaderRoute: typeof MeRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/daily": {
       id: "/daily";
       path: "/daily";
@@ -71,6 +88,7 @@ declare module "@tanstack/react-router" {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DailyRoute: DailyRoute,
+  MeRoute: MeRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

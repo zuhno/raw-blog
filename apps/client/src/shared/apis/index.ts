@@ -2,12 +2,14 @@ import auth from "./auth";
 import comments from "./comments";
 import contents from "./contents";
 import tags from "./tags";
+import users from "./users";
 
 const endpoints = {
   auth,
   contents,
   comments,
   tags,
+  users,
 };
 
 export const authApi = {
@@ -73,6 +75,13 @@ export const commentsApi = {
 export const tagsApi = {
   getSearchByName: (name: string) => {
     const { request, path } = endpoints.tags.searchByName(name);
+    return request(path);
+  },
+};
+
+export const usersApi = {
+  getMe: () => {
+    const { request, path } = endpoints.users.me();
     return request(path);
   },
 };

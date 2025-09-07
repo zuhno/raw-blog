@@ -6,7 +6,6 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  RelationId,
   OneToMany,
 } from "typeorm";
 
@@ -18,13 +17,13 @@ export class Comment {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @RelationId((comment: Comment) => comment.author)
+  @Column({ name: "author_id" })
   authorId!: number;
 
-  @RelationId((comment: Comment) => comment.content)
+  @Column({ name: "content_id" })
   contentId!: number;
 
-  @RelationId((comment: Comment) => comment.parent)
+  @Column({ name: "parent_id", nullable: true })
   parentId?: number;
 
   @Column({ type: "text" })

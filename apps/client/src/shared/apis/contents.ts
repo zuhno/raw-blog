@@ -13,7 +13,7 @@ interface IContent {
 interface ICreateResp extends IContent {}
 interface IListResp {
   contents: IContent[];
-  nextOffset: number;
+  lastOffset: number;
   hasNext: boolean;
 }
 interface IDetailResp extends IContent {}
@@ -33,11 +33,11 @@ export default {
     body: data,
   }),
   list: (query: {
-    type: string;
-    tagIds: string[];
-    offset: number;
-    limit: number;
-    sort: number;
+    type: "POST" | "DAILY";
+    limit?: number;
+    offset?: number;
+    tagIds?: string[];
+    sort?: number;
   }) => ({
     request: http.get<IListResp>,
     path: "contents",

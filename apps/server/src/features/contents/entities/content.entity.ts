@@ -8,21 +8,18 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  RelationId,
 } from "typeorm";
 
 import { User } from "../../../features/users/entities/user.entity";
 import { EContentType } from "../../../shared/utils/type";
 import { Tag } from "../../tags/entities/tag.entity";
 
-export enum a {}
-
 @Entity("content")
 export class Content {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @RelationId((content: Content) => content.author)
+  @Column({ name: "author_id" })
   authorId!: number;
 
   @Column({ type: "varchar" })

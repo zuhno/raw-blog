@@ -42,9 +42,15 @@ export class ContentsService {
 
     const query = this.repo
       .createQueryBuilder("c")
-      .where("c.type = :type", { type })
-      .andWhere(`c.id ${op} :offset`, { offset })
+      .where("c.type = :type", { type });
+
+    if (offset !== undefined) {
+      query.andWhere(`c.id ${op} :offset`, { offset });
+    }
+
+    query
       .andWhere("c.publish = true")
+      .andWhere("c.private = false")
       .orderBy("c.id", order)
       .limit(limit + 1)
       .select([
@@ -53,17 +59,17 @@ export class ContentsService {
         "c.type",
         "c.publish",
         "c.private",
-        "c.created_at",
-        "c.updated_at",
-        "c.author_id",
+        "c.createdAt",
+        "c.updatedAt",
+        "c.authorId",
       ]);
 
     const rows = await query.getMany();
     const hasNext = rows.length > limit;
     const contents = hasNext ? rows.slice(0, limit) : rows;
-    const nextOffset = contents.at(-1)?.id ?? null;
+    const lastOffset = contents.at(-1)?.id ?? null;
 
-    return { contents, nextOffset, hasNext };
+    return { contents, lastOffset, hasNext };
   }
 
   async listQueryByTags(
@@ -83,6 +89,7 @@ export class ContentsService {
       .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
       .andWhere(`c.id ${op} :offset`, { offset })
       .andWhere("c.publish = true")
+      .andWhere("c.private = false")
       .groupBy("c.id")
       .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length })
       .orderBy("c.id", order)
@@ -93,17 +100,17 @@ export class ContentsService {
         "c.type",
         "c.publish",
         "c.private",
-        "c.created_at",
-        "c.updated_at",
-        "c.author_id",
+        "c.createdAt",
+        "c.updatedAt",
+        "c.authorId",
       ]);
 
     const rows = await query.getMany();
     const hasNext = rows.length > limit;
     const contents = hasNext ? rows.slice(0, limit) : rows;
-    const nextOffset = contents.at(-1)?.id ?? null;
+    const lastOffset = contents.at(-1)?.id ?? null;
 
-    return { contents, nextOffset, hasNext };
+    return { contents, lastOffset, hasNext };
   }
 
   async create(authorId: number, data: CreateContentDto) {
@@ -141,7 +148,7 @@ export class ContentsService {
     limit: number,
     sort: ESortType
   ) {
-    const withTag = tagIds.length >= 0;
+    const withTag = tagIds.length > 0;
 
     if (!withTag) return this.listQuery(type, offset, limit, sort);
     return this.listQueryByTags(type, tagIds, offset, limit, sort);
@@ -182,7 +189,7 @@ export class ContentsService {
     await this.dataSource.transaction(async (tm) => {
       const raw = await tm
         .createQueryBuilder()
-        .select("c.author_id", "authorId")
+        .select("c.authorId", "authorId")
         .from(Content, "c")
         .where("c.id = :id", { id })
         .getRawOne<{ authorId: number }>();

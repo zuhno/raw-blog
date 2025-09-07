@@ -58,7 +58,7 @@ export class CommentsService {
     const rows = await this.repo
       .createQueryBuilder("c")
       .leftJoin("c.author", "a")
-      .where("c.content_id = :contentId", { contentId })
+      .where("c.contentId = :contentId", { contentId })
       .orderBy("c.id", "DESC")
       .select([
         "c.id",

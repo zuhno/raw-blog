@@ -31,8 +31,8 @@ export class ListQuery {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
-  offset: number = 0;
+  @Min(0)
+  offset: number;
 
   @IsOptional()
   @Type(() => Number)

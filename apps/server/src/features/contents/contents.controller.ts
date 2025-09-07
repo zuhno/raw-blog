@@ -11,9 +11,9 @@ import {
 } from "@nestjs/common";
 
 import { ContentsService } from "./contents.service";
-import type { ListQuery } from "./dto/content-list.dto";
-import type { CreateContentDto } from "./dto/create-content.dto";
-import type { UpdateContentDto } from "./dto/update-content.dto";
+import { ListQuery } from "./dto/content-list.dto";
+import { CreateContentDto } from "./dto/create-content.dto";
+import { UpdateContentDto } from "./dto/update-content.dto";
 import { RequestUser } from "../../shared/decorators/request-user.decorator";
 import { RequireUser } from "../../shared/decorators/require-user.decorator";
 import type { TRequestUser } from "../../shared/utils/type";

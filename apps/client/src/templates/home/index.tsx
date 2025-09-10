@@ -1,6 +1,8 @@
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { contentsApi } from "../../shared/apis";
+import { formatDateLocale } from "../../shared/utils/date";
 
 type ListData = NonNullable<
   Awaited<ReturnType<typeof contentsApi.getList>>["data"]
@@ -15,12 +17,17 @@ const HomeTemplate = () => {
     });
   }, []);
 
+  if (!data.length) return;
+
   return (
-    <div className="home">
-      {data?.map((item) => {
+    <div>
+      {data.map((item) => {
         return (
-          <div key={item.id}>
-            {item.title} - {item.authorId}
+          <div key={item.id} style={{ marginBottom: 20 }}>
+            <Link to="/detail/$id" params={{ id: "" + item.id }}>
+              {item.title}
+            </Link>
+            <div>{formatDateLocale(item.createdAt)}</div>
           </div>
         );
       })}

@@ -4,19 +4,14 @@ import Navigation from "./Navigation";
 
 const RootLayout = () => {
   return (
-    <div>
-      <header
-        style={{
-          boxShadow: "0 3px 3px #00000010",
-          paddingBottom: 0,
-        }}
-      >
+    <>
+      <header style={{ padding: 10 }}>
         <Navigation />
       </header>
-      <main>
+      <main style={{ padding: 10 }}>
         <Outlet />
       </main>
-    </div>
+    </>
   );
 };
 

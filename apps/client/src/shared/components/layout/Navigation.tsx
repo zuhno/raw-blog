@@ -4,23 +4,26 @@ import AccountBtn from "../button/AccountBtn";
 
 const Navigation = () => {
   return (
-    <nav style={{ marginBottom: 0 }}>
-      <ul>
-        <li>
-          <Link
-            to="/"
-            activeProps={{ style: { fontWeight: 900 } }}
-            activeOptions={{ exact: true }}
-          >
-            Post
-          </Link>
-        </li>
-        <li>
-          <Link to="/daily" activeProps={{ style: { fontWeight: 900 } }}>
-            Daily
-          </Link>
-        </li>
-      </ul>
+    <nav
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        minHeight: 40,
+      }}
+    >
+      <div style={{ display: "flex", gap: 20 }}>
+        <Link
+          to="/"
+          activeProps={{ style: { fontWeight: 900 } }}
+          activeOptions={{ exact: true }}
+        >
+          Post
+        </Link>
+        <Link to="/daily" activeProps={{ style: { fontWeight: 900 } }}>
+          Daily
+        </Link>
+      </div>
 
       <AccountBtn />
     </nav>

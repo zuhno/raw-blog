@@ -16,7 +16,7 @@ const UserBtn = () => {
   if (!user) return null;
 
   return (
-    <Link to="/me">
+    <Link to="/me" style={{ height: 40 }}>
       <img src={user.avatarUrl} alt="" style={{ width: 40, height: 40 }} />
     </Link>
   );

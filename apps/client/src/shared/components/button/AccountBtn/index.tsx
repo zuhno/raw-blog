@@ -1,12 +1,13 @@
-import LoginBtn from "./LoginBtn";
 import UserBtn from "./UserBtn";
 import useAccessToken from "../../../hooks/useAccessToken";
 
 const AccountBtn = () => {
-  const { token, setToken } = useAccessToken();
+  const { token } = useAccessToken();
   const isLoggedIn = !!token;
 
-  return isLoggedIn ? <UserBtn /> : <LoginBtn setToken={setToken} />;
+  if (!isLoggedIn) return null;
+
+  return <UserBtn />;
 };
 
 export default AccountBtn;

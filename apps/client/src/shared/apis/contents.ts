@@ -8,6 +8,7 @@ interface IContent {
   publish: boolean;
   private: boolean;
   type: "DAILY" | "POST";
+  createdAt: string;
 }
 
 interface ICreateResp extends IContent {}

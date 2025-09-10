@@ -80,6 +80,11 @@ export class AuthService {
 
     const { email, name, picture } = await this.googleOAuthProcess(code);
 
+    const isOwner = email === this.configService.get("OWNER_EMAIL");
+    if (!isOwner) {
+      throw new BadRequestException("This account is not authorized");
+    }
+
     const user = await this.usersService.findAndCreate({
       email: email!,
       nickname: name!,

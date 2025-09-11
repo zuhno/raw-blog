@@ -1,3 +1,5 @@
+import path from "path";
+
 import js from "@eslint/js";
 import { globalIgnores } from "eslint/config";
 import globals from "globals";
@@ -5,18 +7,6 @@ import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import eslintPluginImport from "eslint-plugin-import";
-
-const serverTypeChecked = tseslint.configs.recommendedTypeChecked.map(
-  (cfg) => ({
-    ...cfg,
-    files: ["apps/server/**/*.{ts,tsx}"],
-  })
-);
-
-const clientRecommended = tseslint.configs.recommended.map((cfg) => ({
-  ...cfg,
-  files: ["apps/client/**/*.{ts,tsx}"],
-}));
 
 export default [
   globalIgnores(["node_modules", "**/dist", "**/node_modules", "**/coverage"]),
@@ -34,10 +24,10 @@ export default [
   },
 
   // apps/server
-  ...serverTypeChecked,
   {
-    files: ["apps/server/**/*.{ts,js}"],
+    files: ["apps/server/**/*.ts"],
     languageOptions: {
+      parser: tseslint.parser,
       ecmaVersion: 2020,
       globals: {
         ...globals.node,
@@ -46,13 +36,18 @@ export default [
       sourceType: "commonjs",
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: new URL("./apps/server", import.meta.url),
+        tsconfigRootDir: path.join(process.cwd(), "apps/server"),
       },
     },
     plugins: {
+      "@typescript-eslint": tseslint.plugin,
       import: eslintPluginImport,
     },
     rules: {
+      ...Object.assign(
+        {},
+        ...tseslint.configs.recommendedTypeChecked.map((c) => c.rules || {})
+      ),
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-floating-promises": "off",
@@ -78,25 +73,84 @@ export default [
       ],
     },
   },
+  {
+    files: ["apps/server/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: "commonjs",
+      globals: globals.node,
+    },
+    plugins: { import: eslintPluginImport },
+    rules: {
+      "import/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+          ],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+    },
+  },
 
   // apps/client
-  ...clientRecommended,
   {
     files: ["apps/client/**/*.{ts,tsx}"],
     languageOptions: {
+      parser: tseslint.parser,
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: path.join(process.cwd(), "apps/client"),
+      },
     },
     plugins: {
+      "@typescript-eslint": tseslint.plugin,
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
       import: eslintPluginImport,
     },
     rules: {
+      ...Object.assign(
+        {},
+        ...tseslint.configs.recommendedTypeChecked.map((c) => c.rules || {})
+      ),
       ...(reactHooks.configs["recommended-latest"]?.rules ?? {}),
       ...(reactRefresh.configs.vite?.rules ?? {}),
       "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
       "react-refresh/only-export-components": "off",
+      "import/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+          ],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+    },
+  },
+  {
+    files: ["apps/client/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: { import: eslintPluginImport },
+    rules: {
       "import/order": [
         "warn",
         {

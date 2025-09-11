@@ -3,62 +3,44 @@ import { useEffect, useState } from "react";
 
 import { contentsApi } from "../../shared/apis";
 import Editor from "../../shared/components/tiptap/Editor";
-import { formatDateLocale } from "../../shared/utils/date";
 import type { Nullable } from "../../shared/utils/type";
 
 type TData = Nullable<
   Awaited<ReturnType<typeof contentsApi.getDetail>>["data"]
 >;
 
-const DetailTemplate = () => {
+const EditTemplate = () => {
   const navigate = useNavigate();
   const { id } = useParams({ strict: false });
   const [data, setData] = useState<TData>(null);
-  const [isOwner, setIsOwner] = useState(false);
-
-  const toEdit = () => {
-    navigate({ to: "/edit/$id", params: { id: "" + id } });
-  };
 
   useEffect(() => {
     if (!id) return;
-    contentsApi
-      .getVerify(+id)
-      .then((res) => {
-        if (res.success) setIsOwner(true);
-      })
-      .catch(() => {});
+    contentsApi.getVerify(+id).catch(() => {
+      navigate({ to: "/" });
+    });
     contentsApi.getDetail(+id).then((res) => {
       if (res.success) setData(res.data);
     });
-  }, [id]);
+  }, [id, navigate]);
 
   if (!data) return;
 
   return (
     <>
-      <title>{data.title}</title>
       <div>
         <h2>{data.title}</h2>
         <p>
-          {formatDateLocale(data.createdAt)}
-          {" / "}
           <span style={{ textTransform: "capitalize" }}>
             {data.type.toLowerCase()}
           </span>
-          {isOwner && (
-            <>
-              {" / "}
-              <button onClick={toEdit}>Edit</button>
-            </>
-          )}
         </p>
         <article style={{ marginTop: 30 }}>
-          <Editor editable={false} content={JSON.parse(data.body)} />
+          <Editor editable={true} content={JSON.parse(data.body)} />
         </article>
       </div>
     </>
   );
 };
 
-export default DetailTemplate;
+export default EditTemplate;

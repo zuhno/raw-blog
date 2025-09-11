@@ -28,6 +28,15 @@ export class ContentsController {
     return this.contentsService.create(user.id, body);
   }
 
+  @Get(":id/verify")
+  @RequireUser()
+  verify(
+    @RequestUser() user: TRequestUser,
+    @Param("id", ParseIntPipe) id: number
+  ) {
+    return this.contentsService.verify(id, user.id);
+  }
+
   @Get()
   @RequireUser({ strict: false })
   list(@RequestUser() user: TRequestUser, @Query() query: ListQuery) {

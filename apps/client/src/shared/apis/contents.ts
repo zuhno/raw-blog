@@ -33,6 +33,10 @@ export default {
     path: "contents",
     body: data,
   }),
+  verify: (id: number) => ({
+    request: http.get,
+    path: `contents/${id}/verify`,
+  }),
   list: (query: {
     type: "POST" | "DAILY";
     limit?: number;

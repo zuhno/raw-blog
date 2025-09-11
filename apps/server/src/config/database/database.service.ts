@@ -1,5 +1,3 @@
-import { join } from "node:path";
-
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm";
@@ -16,7 +14,7 @@ export class DatabaseService implements TypeOrmOptionsFactory {
       port: +this.configService.get<number>("DB_PORT")!,
       host: this.configService.get<string>("DB_HOST"),
       database: this.configService.get<string>("DB_SCHEMA"),
-      entities: [join(__dirname, "../../**/*.entity.{ts,js}")],
+      autoLoadEntities: true,
       synchronize: process.env.NODE_ENV === "production" ? false : true,
     };
   }

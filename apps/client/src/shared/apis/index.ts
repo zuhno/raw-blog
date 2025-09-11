@@ -29,6 +29,10 @@ export const authApi = {
 };
 
 export const contentsApi = {
+  getVerify: (id: number) => {
+    const { request, path } = endpoints.contents.verify(id);
+    return request(path);
+  },
   getList: (query: Parameters<typeof endpoints.contents.list>[0]) => {
     const { request, path, searchParams } = endpoints.contents.list(query);
     return request(path, { searchParams });

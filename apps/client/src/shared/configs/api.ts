@@ -3,6 +3,27 @@ import ky, { HTTPError, type Options } from "ky";
 import { tokenStore } from "../../states/token";
 import { authManager } from "../utils/auth";
 
+export type JsonValue =
+  | Record<string, unknown>
+  | unknown[]
+  | string
+  | number
+  | boolean
+  | null;
+
+type HttpErrorBody =
+  | string
+  | {
+      statusCode?: number;
+      message?: string | string[];
+      error?: string;
+      code?: string;
+      [key: string]: unknown;
+    };
+
+type Ok<T> = { success: true; data: T; error?: never };
+type Err = { success: false; error: HttpErrorBody; data?: never };
+type ICommonRespType<T> = Ok<T> | Err;
 type RetryGuardOptions = Options & { _retriedOnce?: boolean };
 
 const api = ky.create({
@@ -73,37 +94,15 @@ const api = ky.create({
   },
 });
 
-export type JsonValue =
-  | Record<string, unknown>
-  | unknown[]
-  | string
-  | number
-  | boolean
-  | null;
-
-type HttpErrorBody =
-  | string
-  | {
-      statusCode?: number;
-      message?: string | string[];
-      error?: string;
-      code?: string;
-      [key: string]: unknown;
-    };
-
-type Ok<T> = { success: true; data: T; error?: never };
-type Err = { success: false; error: HttpErrorBody; data?: never };
-type ICommonRespType<T> = Ok<T> | Err;
-
 export const http = {
   get: async <T>(url: string, opts?: Options) => {
     try {
       return await api.get(url, opts).json<ICommonRespType<T>>();
-    } catch (e) {
-      if (e instanceof HTTPError) {
-        //
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        throw await error.response.json();
       }
-      throw e;
+      throw error;
     }
   },
   post: async <T>(url: string, body?: JsonValue, opts?: Options) => {
@@ -111,11 +110,11 @@ export const http = {
       return await api
         .post(url, { json: body, ...opts })
         .json<ICommonRespType<T>>();
-    } catch (e) {
-      if (e instanceof HTTPError) {
-        //
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        throw await error.response.json();
       }
-      throw e;
+      throw error;
     }
   },
   patch: async <T>(url: string, body?: JsonValue, opts?: Options) => {
@@ -123,21 +122,21 @@ export const http = {
       return await api
         .patch(url, { json: body, ...opts })
         .json<ICommonRespType<T>>();
-    } catch (e) {
-      if (e instanceof HTTPError) {
-        //
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        throw await error.response.json();
       }
-      throw e;
+      throw error;
     }
   },
   delete: async <T>(url: string, opts?: Options) => {
     try {
       return await api.delete(url, { ...opts }).json<ICommonRespType<T>>();
-    } catch (e) {
-      if (e instanceof HTTPError) {
-        //
+    } catch (error) {
+      if (error instanceof HTTPError) {
+        throw await error.response.json();
       }
-      throw e;
+      throw error;
     }
   },
 };

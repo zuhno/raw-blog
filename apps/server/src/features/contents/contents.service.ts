@@ -141,6 +141,12 @@ export class ContentsService {
     return this.repo.save(content);
   }
 
+  async verify(id: number, authorId: number) {
+    const exist = await this.repo.existsBy({ id, authorId });
+    if (!exist) throw new NotFoundException("This content is not yours");
+    return exist;
+  }
+
   async list(
     type: EContentType,
     tagIds: number[],

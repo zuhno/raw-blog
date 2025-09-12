@@ -1,26 +1,28 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import { contentsApi } from "../../shared/apis";
+import useAccessToken from "../../shared/hooks/useAccessToken";
 import useInput from "../../shared/hooks/useInput";
 import useTiptapEditor from "../../shared/hooks/useTiptapEditor";
 import useToggle from "../../shared/hooks/useToggle";
 
-const EditTemplate = () => {
+const NewTemplate = () => {
   const navigate = useNavigate();
-  const { id } = useParams({ strict: false });
+  const { token } = useAccessToken();
 
-  const [title, setTitle, onChangeTitle] = useInput();
-  const [type, setType, onChangeType] = useInput<HTMLSelectElement>("POST");
+  const [title, , onChangeTitle] = useInput();
+  const [type, , onChangeType] = useInput<HTMLSelectElement>("POST");
   const [isPrivate, toggleIsPrivate] = useToggle();
   const [isPublish, toggleIsPublish] = useToggle();
 
-  const { TiptapEditor, TiptapMenuBar, setContent, extractContent } =
-    useTiptapEditor({ editable: true });
+  const { TiptapEditor, TiptapMenuBar, extractContent } = useTiptapEditor({
+    editable: true,
+  });
 
   const onSave = async () => {
     const data = extractContent();
-    const res = await contentsApi.patchUpdate(+id!, {
+    const res = await contentsApi.postCreate({
       title,
       body: JSON.stringify(data),
       private: isPrivate,
@@ -28,35 +30,18 @@ const EditTemplate = () => {
       type,
     });
     if (res.success) {
-      navigate({ to: "/detail/$id", params: { id: id! }, replace: true });
+      navigate({
+        to: "/detail/$id",
+        params: { id: "" + res.data.id },
+        replace: true,
+      });
     }
   };
 
   useEffect(() => {
-    if (!id) return;
-    contentsApi.getVerify(+id).catch(() => {
-      navigate({ to: "/" });
-    });
-    contentsApi.getDetail(+id).then((res) => {
-      if (res.success) {
-        setTitle(res.data.title);
-        setType(res.data.type);
-        setContent(res.data.body);
-        if (res.data.private) toggleIsPrivate();
-        if (res.data.publish) toggleIsPublish();
-      }
-    });
-  }, [
-    id,
-    navigate,
-    setContent,
-    setTitle,
-    setType,
-    toggleIsPrivate,
-    toggleIsPublish,
-  ]);
-
-  if (!title) return;
+    const isLoggedIn = !!token;
+    if (!isLoggedIn) navigate({ to: "/", replace: true });
+  }, [token, navigate]);
 
   return (
     <>
@@ -108,4 +93,4 @@ const EditTemplate = () => {
   );
 };
 
-export default EditTemplate;
+export default NewTemplate;

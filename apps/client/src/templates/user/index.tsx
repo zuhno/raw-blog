@@ -7,17 +7,21 @@ import useUserProfile from "../../shared/hooks/useUserProfile";
 
 const UserTemplate = () => {
   const navigate = useNavigate();
-  const { user, clearUser } = useUserProfile();
+  const { clearUser } = useUserProfile();
   const { token, setToken, clearToken } = useAccessToken();
 
   const isLoggedIn = !!token;
+
+  const toNew = () => {
+    navigate({ to: "/new" });
+  };
 
   const onSignout = async () => {
     const res = await authApi.postSignout();
     if (res.success) {
       clearToken();
       clearUser();
-      navigate({ to: "/" });
+      navigate({ to: "/", replace: true });
     }
   };
 
@@ -25,9 +29,9 @@ const UserTemplate = () => {
 
   return (
     <div>
-      userTemplate - {user?.nickname}
-      <div>
-        <button onClick={onSignout}>LOGOUT</button>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={toNew}>New content</button>
+        <button onClick={onSignout}>Logout</button>
       </div>
     </div>
   );

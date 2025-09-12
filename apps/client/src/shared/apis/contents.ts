@@ -27,7 +27,7 @@ export default {
     type: string;
     publish: boolean;
     private: boolean;
-    tags: string[];
+    tags?: string[];
   }) => ({
     request: http.post<ICreateResp>,
     path: "contents",

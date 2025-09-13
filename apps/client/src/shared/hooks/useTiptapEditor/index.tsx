@@ -37,6 +37,7 @@ import {
   LuLink,
   LuUnlink,
   LuImage,
+  LuImageUp,
 } from "react-icons/lu";
 import { ResizableImage } from "tiptap-extension-resizable-image";
 
@@ -48,8 +49,6 @@ interface IProps {
 }
 
 const useTiptapEditor = (props?: IProps) => {
-  const blobUrls = useRef<string[]>([]);
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -69,8 +68,6 @@ const useTiptapEditor = (props?: IProps) => {
         onUpload(file: File) {
           return new Promise((r) => {
             const src = URL.createObjectURL(file);
-            console.log("drop");
-            blobUrls.current.push(src);
             return r({
               src,
               "data-keep-ratio": true,
@@ -110,15 +107,6 @@ const useTiptapEditor = (props?: IProps) => {
   const extractContent = useCallback(() => {
     return editor?.getJSON();
   }, [editor]);
-
-  useEffect(() => {
-    const ref = blobUrls.current;
-    return () => {
-      ref.forEach((blobUrl) => {
-        URL.revokeObjectURL(blobUrl);
-      });
-    };
-  }, []);
 
   return {
     TiptapEditor,
@@ -196,9 +184,24 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   };
 
   const imgRef = useRef<HTMLInputElement>(null);
-  const addImage = () => {
-    imgRef.current?.click();
+  const addImage = (isExternal?: boolean) => {
+    if (isExternal) {
+      handleExternalImage();
+    } else imgRef.current?.click();
   };
+
+  const handleExternalImage = () => {
+    const src = window.prompt("Image URL", "");
+    if (!src) return;
+    if (!/^https?:\/\//.test(src)) return;
+
+    try {
+      editor.commands.setResizableImage({ src, "data-keep-ratio": true });
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
   const handleImage = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -212,7 +215,6 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   useEffect(() => {
     const ref = blobUrls.current;
     return () => {
-      console.log(ref);
       ref.forEach((blobUrl) => {
         URL.revokeObjectURL(blobUrl);
       });
@@ -318,7 +320,10 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
         >
           <LuSquareCode />
         </button>
-        <button onClick={addImage}>
+        <button onClick={() => addImage()}>
+          <LuImageUp />
+        </button>
+        <button onClick={() => addImage(true)}>
           <LuImage />
         </button>
         <button

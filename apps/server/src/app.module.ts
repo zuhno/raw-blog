@@ -10,6 +10,7 @@ import { SecurityConfigModule } from "./config/security/security.module";
 import { AuthModule } from "./features/auth/auth.module";
 import { CommentsModule } from "./features/comments/comments.module";
 import { ContentsModule } from "./features/contents/contents.module";
+import { FilesModule } from "./features/files/files.module";
 import { TagsModule } from "./features/tags/tags.module";
 import { UsersModule } from "./features/users/users.module";
 
@@ -35,6 +36,7 @@ import { UsersModule } from "./features/users/users.module";
     TagsModule,
     CommentsModule,
     UsersModule,
+    FilesModule,
 
     // Router
     RouterModule.register([
@@ -60,6 +62,10 @@ import { UsersModule } from "./features/users/users.module";
           {
             path: "users",
             module: UsersModule,
+          },
+          {
+            path: "files",
+            module: FilesModule,
           },
         ],
       },

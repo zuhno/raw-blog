@@ -1,6 +1,7 @@
 import auth from "./auth";
 import comments from "./comments";
 import contents from "./contents";
+import files from "./files";
 import tags from "./tags";
 import users from "./users";
 
@@ -10,6 +11,7 @@ const endpoints = {
   comments,
   tags,
   users,
+  files,
 };
 
 export const authApi = {
@@ -87,5 +89,12 @@ export const usersApi = {
   getMe: () => {
     const { request, path } = endpoints.users.me();
     return request(path);
+  },
+};
+
+export const filesApi = {
+  postUploadImg: (file: File) => {
+    const { request, path, body } = endpoints.files.uploadImage(file);
+    return request(path, body);
   },
 };

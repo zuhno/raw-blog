@@ -5,6 +5,7 @@ import { contentsApi } from "../../shared/apis";
 import useInput from "../../shared/hooks/useInput";
 import useTiptapEditor from "../../shared/hooks/useTiptapEditor";
 import useToggle from "../../shared/hooks/useToggle";
+import useUploadImage from "../../shared/hooks/useUploadImage";
 
 const EditTemplate = () => {
   const navigate = useNavigate();
@@ -17,9 +18,13 @@ const EditTemplate = () => {
 
   const { TiptapEditor, TiptapMenuBar, setContent, extractContent } =
     useTiptapEditor({ editable: true });
+  const { tiptapContentUpload } = useUploadImage();
 
   const onSave = async () => {
-    const data = extractContent();
+    let data = extractContent();
+    data = await tiptapContentUpload(data).catch(() => null);
+    if (!data) return;
+
     const res = await contentsApi.patchUpdate(+id!, {
       title,
       body: JSON.stringify(data),

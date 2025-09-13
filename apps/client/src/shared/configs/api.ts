@@ -9,6 +9,7 @@ export type JsonValue =
   | string
   | number
   | boolean
+  | FormData
   | null;
 
 type HttpErrorBody =
@@ -107,8 +108,9 @@ export const http = {
   },
   post: async <T>(url: string, body?: JsonValue, opts?: Options) => {
     try {
+      const isFormData = body instanceof FormData;
       return await api
-        .post(url, { json: body, ...opts })
+        .post(url, { ...(isFormData ? { body } : { json: body }), ...opts })
         .json<ICommonRespType<T>>();
     } catch (error) {
       if (error instanceof HTTPError) {
@@ -119,8 +121,9 @@ export const http = {
   },
   patch: async <T>(url: string, body?: JsonValue, opts?: Options) => {
     try {
+      const isFormData = body instanceof FormData;
       return await api
-        .patch(url, { json: body, ...opts })
+        .patch(url, { ...(isFormData ? { body } : { json: body }), ...opts })
         .json<ICommonRespType<T>>();
     } catch (error) {
       if (error instanceof HTTPError) {

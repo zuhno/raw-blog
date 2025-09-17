@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { contentsApi } from "../../shared/apis";
+import useTag from "../../shared/hooks/useTag";
 import useTiptapEditor from "../../shared/hooks/useTiptapEditor";
 import { formatDateLocale } from "../../shared/utils/date";
 import type { Nullable } from "../../shared/utils/type";
@@ -17,6 +18,7 @@ const DetailTemplate = () => {
   const [isOwner, setIsOwner] = useState(false);
 
   const { setContent, TiptapEditor } = useTiptapEditor({ editable: false });
+  const { initTag, TagList } = useTag({ editable: false });
 
   const toEdit = () => {
     navigate({ to: "/edit/$id", params: { id: "" + id } });
@@ -34,9 +36,10 @@ const DetailTemplate = () => {
       if (res.success) {
         setData(res.data);
         setContent(res.data.body);
+        initTag(res.data.tags.map((tag) => tag.name));
       }
     });
-  }, [id, setContent]);
+  }, [id, setContent, initTag]);
 
   if (!data) return;
 
@@ -58,6 +61,7 @@ const DetailTemplate = () => {
             </>
           )}
         </p>
+        <TagList />
         <article style={{ marginTop: 30 }}>
           <TiptapEditor />
         </article>

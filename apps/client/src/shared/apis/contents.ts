@@ -8,6 +8,10 @@ interface IContent {
   publish: boolean;
   private: boolean;
   type: "DAILY" | "POST";
+  tags: {
+    id: number;
+    name: string;
+  }[];
   createdAt: string;
 }
 

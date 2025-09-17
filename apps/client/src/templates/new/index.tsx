@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { contentsApi } from "../../shared/apis";
 import useAccessToken from "../../shared/hooks/useAccessToken";
 import useInput from "../../shared/hooks/useInput";
+import useTag from "../../shared/hooks/useTag";
 import useTiptapEditor from "../../shared/hooks/useTiptapEditor";
 import useToggle from "../../shared/hooks/useToggle";
 import useUploadImage from "../../shared/hooks/useUploadImage";
@@ -21,6 +22,7 @@ const NewTemplate = () => {
     editable: true,
   });
   const { tiptapContentUpload } = useUploadImage();
+  const { tags, TagList, TagForm } = useTag();
 
   const onSave = async () => {
     let data = extractContent();
@@ -33,6 +35,7 @@ const NewTemplate = () => {
       private: isPrivate,
       publish: isPublish,
       type,
+      tags,
     });
     if (res.success) {
       navigate({
@@ -87,6 +90,8 @@ const NewTemplate = () => {
           {" | "}
           <button onClick={onSave}>Save</button>
         </p>
+        <TagList />
+        <TagForm />
         <br />
         <article>
           <TiptapMenuBar />

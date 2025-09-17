@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 import { contentsApi } from "../../shared/apis";
 import useInput from "../../shared/hooks/useInput";
+import useTag from "../../shared/hooks/useTag";
 import useTiptapEditor from "../../shared/hooks/useTiptapEditor";
 import useToggle from "../../shared/hooks/useToggle";
 import useUploadImage from "../../shared/hooks/useUploadImage";
@@ -19,6 +20,7 @@ const EditTemplate = () => {
   const { TiptapEditor, TiptapMenuBar, setContent, extractContent } =
     useTiptapEditor({ editable: true });
   const { tiptapContentUpload } = useUploadImage();
+  const { tags, initTag, TagList, TagForm } = useTag();
 
   const onSave = async () => {
     let data = extractContent();
@@ -31,6 +33,7 @@ const EditTemplate = () => {
       private: isPrivate,
       publish: isPublish,
       type,
+      tags,
     });
     if (res.success) {
       navigate({ to: "/detail/$id", params: { id: id! }, replace: true });
@@ -49,6 +52,7 @@ const EditTemplate = () => {
         setContent(res.data.body);
         if (res.data.private) toggleIsPrivate();
         if (res.data.publish) toggleIsPublish();
+        if (res.data.tags.length) initTag(res.data.tags.map((tag) => tag.name));
       }
     });
   }, [
@@ -59,6 +63,7 @@ const EditTemplate = () => {
     setType,
     toggleIsPrivate,
     toggleIsPublish,
+    initTag,
   ]);
 
   if (!title) return;
@@ -102,6 +107,8 @@ const EditTemplate = () => {
           {" | "}
           <button onClick={onSave}>Save</button>
         </p>
+        <TagList />
+        <TagForm />
         <br />
         <article>
           <TiptapMenuBar />

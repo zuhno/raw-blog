@@ -42,11 +42,12 @@ export default {
     path: `contents/${id}/verify`,
   }),
   list: (query: {
-    type: "POST" | "DAILY";
+    type?: "POST" | "DAILY";
     limit?: number;
     offset?: number;
     tagIds?: string[];
     sort?: number;
+    all?: number;
   }) => ({
     request: http.get<IListResp>,
     path: "contents",

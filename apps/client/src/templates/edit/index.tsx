@@ -20,7 +20,7 @@ const EditTemplate = () => {
   const { TiptapEditor, TiptapMenuBar, setContent, extractContent } =
     useTiptapEditor({ editable: true });
   const { tiptapContentUpload } = useUploadImage();
-  const { tags, initTag, TagList, TagForm } = useTag();
+  const { tagNames, initTag, TagList, TagForm } = useTag();
 
   const onSave = async () => {
     let data = extractContent();
@@ -33,7 +33,7 @@ const EditTemplate = () => {
       private: isPrivate,
       publish: isPublish,
       type,
-      tags,
+      tags: tagNames,
     });
     if (res.success) {
       navigate({ to: "/detail/$id", params: { id: id! }, replace: true });
@@ -42,19 +42,24 @@ const EditTemplate = () => {
 
   useEffect(() => {
     if (!id) return;
-    contentsApi.getVerify(+id).catch(() => {
-      navigate({ to: "/" });
-    });
-    contentsApi.getDetail(+id).then((res) => {
-      if (res.success) {
-        setTitle(res.data.title);
-        setType(res.data.type);
-        setContent(res.data.body);
-        if (res.data.private) toggleIsPrivate();
-        if (res.data.publish) toggleIsPublish();
-        if (res.data.tags.length) initTag(res.data.tags.map((tag) => tag.name));
-      }
-    });
+    contentsApi
+      .getVerify(+id)
+      .then(() => {
+        contentsApi.getDetail(+id).then((res) => {
+          if (res.success) {
+            setTitle(res.data.title);
+            setType(res.data.type);
+            setContent(res.data.body);
+            if (res.data.private) toggleIsPrivate();
+            if (res.data.publish) toggleIsPublish();
+            if (res.data.tags.length)
+              initTag({ tags: res.data.tags, type: res.data.type });
+          }
+        });
+      })
+      .catch(() => {
+        navigate({ to: "/" });
+      });
   }, [
     id,
     navigate,

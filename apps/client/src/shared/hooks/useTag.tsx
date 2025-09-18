@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 import { LuX } from "react-icons/lu";
 
@@ -7,56 +8,92 @@ interface IProps {
 
 const useTag = (props?: IProps) => {
   if (!props) props = { editable: true };
-  const [tags, setTags] = useState<string[]>([]);
+
+  const navigate = useNavigate();
+  const [tags, setTags] = useState<{ id?: number; name: string }[]>([]);
+  const [type, setType] = useState("POST");
 
   const onSubmitTag = (e: FormEvent) => {
     e.preventDefault();
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
     let newTag = formData.get("tag") as string;
-    if (!newTag) return;
     newTag = newTag.toLowerCase().trim().replace(/\s+/g, "-");
+    if (!newTag) {
+      target.reset();
+      return;
+    }
     setTags((prev) => {
-      if (prev.includes(newTag)) return prev;
-      else return [...prev, newTag];
+      const hasTag = prev.some((item) => item.name === newTag);
+      if (hasTag) return prev;
+      else return [...prev, { name: newTag }];
     });
     target.reset();
   };
 
   const onDeleteTag = (tag: string) => {
     setTags((prev) => {
-      if (prev.includes(tag)) return prev.filter((item) => item !== tag);
+      const hasTag = prev.some((item) => item.name === tag);
+      if (hasTag) return prev.filter((item) => item.name !== tag);
       else return prev;
     });
   };
 
-  const initTag = useCallback((tags: string[]) => {
-    setTags(tags);
-  }, []);
+  const toListByTag = useCallback(
+    (tagId?: number) => {
+      if (props.editable || tagId === undefined) return;
+      navigate({
+        to: type === "POST" ? "/" : "/daily",
+        search: { tagId },
+      });
+    },
+    [navigate, props.editable, type]
+  );
+
+  const initTag = useCallback(
+    ({
+      tags,
+      type,
+    }: {
+      tags: { id: number; name: string }[];
+      type: string;
+    }) => {
+      setTags(tags);
+      setType(type);
+    },
+    []
+  );
 
   const TagList = useMemo(() => {
     return () => {
+      if (!tags.length) return null;
       return (
-        <p style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <p
+          style={{
+            display: "flex",
+            gap: 6,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <span>Tags: </span>
           {tags.map((tag) => {
             return (
-              <span key={tag}>
-                {tag}
+              <button key={tag.name} onClick={() => toListByTag(tag.id)}>
+                {tag.name}
                 {props?.editable && (
-                  <button
+                  <LuX
+                    onClick={() => onDeleteTag(tag.name)}
                     style={{ marginLeft: 3 }}
-                    onClick={() => onDeleteTag(tag)}
-                  >
-                    <LuX />
-                  </button>
+                  />
                 )}
-              </span>
+              </button>
             );
           })}
         </p>
       );
     };
-  }, [tags, props?.editable]);
+  }, [tags, props?.editable, toListByTag]);
 
   const TagForm = useMemo(() => {
     return () => {
@@ -69,7 +106,12 @@ const useTag = (props?: IProps) => {
     };
   }, []);
 
-  return { tags, initTag, TagForm, TagList };
+  return {
+    tagNames: tags.map((tag) => tag.name),
+    initTag,
+    TagForm,
+    TagList,
+  };
 };
 
 export default useTag;

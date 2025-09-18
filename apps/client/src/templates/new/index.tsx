@@ -22,7 +22,7 @@ const NewTemplate = () => {
     editable: true,
   });
   const { tiptapContentUpload } = useUploadImage();
-  const { tags, TagList, TagForm } = useTag();
+  const { tagNames, TagList, TagForm } = useTag();
 
   const onSave = async () => {
     let data = extractContent();
@@ -35,7 +35,7 @@ const NewTemplate = () => {
       private: isPrivate,
       publish: isPublish,
       type,
-      tags,
+      tags: tagNames,
     });
     if (res.success) {
       navigate({

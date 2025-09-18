@@ -38,14 +38,14 @@ export class ContentsController {
   }
 
   @Get()
-  @RequireUser({ strict: false })
-  list(@RequestUser() user: TRequestUser, @Query() query: ListQuery) {
+  list(@Query() query: ListQuery) {
     return this.contentsService.list(
       query.type,
       query.tagIds,
       query.offset,
       query.limit,
-      query.sort
+      query.sort,
+      query.owner
     );
   }
 

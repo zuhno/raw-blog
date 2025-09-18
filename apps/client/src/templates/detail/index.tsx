@@ -31,15 +31,22 @@ const DetailTemplate = () => {
       .then((res) => {
         if (res.success) setIsOwner(true);
       })
-      .catch(() => {});
-    contentsApi.getDetail(+id).then((res) => {
-      if (res.success) {
-        setData(res.data);
-        setContent(res.data.body);
-        initTag(res.data.tags.map((tag) => tag.name));
-      }
-    });
-  }, [id, setContent, initTag]);
+      .catch(() => {})
+      .finally(() => {
+        contentsApi
+          .getDetail(+id)
+          .then((res) => {
+            if (res.success) {
+              setData(res.data);
+              setContent(res.data.body);
+              initTag({ tags: res.data.tags, type: res.data.type });
+            }
+          })
+          .catch(() => {
+            navigate({ to: "/", replace: true });
+          });
+      });
+  }, [id, setContent, initTag, navigate]);
 
   if (!data) return;
 

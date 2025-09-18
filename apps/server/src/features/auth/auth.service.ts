@@ -49,7 +49,7 @@ export class AuthService {
   private async issueAccessToken(user: User) {
     const payload = { ...user };
     const token = await this.jwtService
-      .signAsync(payload, { expiresIn: "15m" })
+      .signAsync(payload, { expiresIn: "30m" })
       .catch((err) => console.log(err));
     return token;
   }

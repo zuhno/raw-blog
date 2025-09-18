@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { authApi } from "../../shared/apis";
 import LoginBtn from "../../shared/components/button/AccountBtn/LoginBtn";
+import ContentList from "../../shared/components/list/ContentList";
 import useAccessToken from "../../shared/hooks/useAccessToken";
 import useUserProfile from "../../shared/hooks/useUserProfile";
 
@@ -29,10 +30,11 @@ const UserTemplate = () => {
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 10 }}>
+      <p style={{ display: "flex", gap: 10 }}>
         <button onClick={toNew}>New content</button>
         <button onClick={onSignout}>Logout</button>
-      </div>
+      </p>
+      <ContentList type="ALL" showLabel isOwner />
     </div>
   );
 };

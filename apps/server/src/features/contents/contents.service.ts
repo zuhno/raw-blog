@@ -35,22 +35,27 @@ export class ContentsService {
     type: EContentType,
     offset: number,
     limit: number,
-    sort: ESortType
+    sort: ESortType,
+    owner: boolean
   ) {
     const order = this.getOrderType(sort);
     const op = this.getIdOpType(sort);
 
-    const query = this.repo
-      .createQueryBuilder("c")
-      .where("c.type = :type", { type });
+    const query = this.repo.createQueryBuilder("c").where("true");
+
+    if (type) {
+      query.andWhere("c.type = :type", { type });
+    }
 
     if (offset !== undefined) {
       query.andWhere(`c.id ${op} :offset`, { offset });
     }
 
+    if (!owner) {
+      query.andWhere("c.publish = true").andWhere("c.private = false");
+    }
+
     query
-      .andWhere("c.publish = true")
-      .andWhere("c.private = false")
       .orderBy("c.id", order)
       .limit(limit + 1)
       .select([
@@ -77,7 +82,8 @@ export class ContentsService {
     tagIds: number[],
     offset: number,
     limit: number,
-    sort: ESortType
+    sort: ESortType,
+    owner: boolean
   ) {
     const order = this.getOrderType(sort);
     const op = this.getIdOpType(sort);
@@ -85,11 +91,21 @@ export class ContentsService {
     const query = this.repo
       .createQueryBuilder("c")
       .innerJoin("content_tag", "ct", "ct.content_id = c.id")
-      .where("c.type = :type", { type })
+      .where("true");
+
+    if (type) {
+      query.andWhere("c.type = :type", { type });
+    }
+
+    if (offset !== undefined) {
+      query.andWhere(`c.id ${op} :offset`, { offset });
+    }
+    if (!owner) {
+      query.andWhere("c.publish = true").andWhere("c.private = false");
+    }
+
+    query
       .andWhere("ct.tag_id IN (:...tagIds)", { tagIds })
-      .andWhere(`c.id ${op} :offset`, { offset })
-      .andWhere("c.publish = true")
-      .andWhere("c.private = false")
       .groupBy("c.id")
       .having("COUNT(DISTINCT ct.tag_id) = :need", { need: tagIds.length })
       .orderBy("c.id", order)
@@ -152,12 +168,13 @@ export class ContentsService {
     tagIds: number[],
     offset: number,
     limit: number,
-    sort: ESortType
+    sort: ESortType,
+    owner: boolean
   ) {
     const withTag = tagIds.length > 0;
 
-    if (!withTag) return this.listQuery(type, offset, limit, sort);
-    return this.listQueryByTags(type, tagIds, offset, limit, sort);
+    if (!withTag) return this.listQuery(type, offset, limit, sort, owner);
+    return this.listQueryByTags(type, tagIds, offset, limit, sort, owner);
   }
 
   async detail(id: number, userId?: number, bypass?: boolean) {

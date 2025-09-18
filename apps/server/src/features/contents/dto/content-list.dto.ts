@@ -24,9 +24,10 @@ export class ListQuery {
   @IsArray()
   tagIds: number[] = [];
 
+  @IsOptional()
   @Type(() => String)
   @IsEnum(EContentType)
-  type!: EContentType;
+  type: EContentType;
 
   @IsOptional()
   @Type(() => Number)
@@ -44,4 +45,8 @@ export class ListQuery {
   @Type(() => Number)
   @IsEnum(ESortType)
   sort: ESortType = ESortType.DESC;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  owner: boolean = false;
 }

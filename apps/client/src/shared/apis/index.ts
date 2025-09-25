@@ -83,6 +83,10 @@ export const tagsApi = {
     const { request, path } = endpoints.tags.searchByName(name);
     return request(path);
   },
+  getSearchById: (id: number) => {
+    const { request, path } = endpoints.tags.searchById(id);
+    return request(path);
+  },
 };
 
 export const usersApi = {

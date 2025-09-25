@@ -63,6 +63,8 @@ const DetailTemplate = () => {
           </span>
           {isOwner && (
             <>
+              {data.private && " | Private"}
+              {!data.publish && " | Unpublished"}
               {" | "}
               <button onClick={toEdit}>Edit</button>
             </>

@@ -4,7 +4,8 @@ import {
   EditorContent,
   useEditor,
   useEditorState,
-  type Content,
+  generateHTML,
+  type JSONContent,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
@@ -39,6 +40,7 @@ import {
   LuImage,
   LuImageUp,
 } from "react-icons/lu";
+import sanitizeHtml from "sanitize-html";
 import { ResizableImage } from "tiptap-extension-resizable-image";
 
 import "tiptap-extension-resizable-image/styles.css";
@@ -49,8 +51,8 @@ interface IProps {
 }
 
 const useTiptapEditor = (props?: IProps) => {
-  const editor = useEditor({
-    extensions: [
+  const extensions = useMemo(
+    () => [
       StarterKit.configure({
         link: {
           isAllowedUri: (url, ctx) =>
@@ -62,7 +64,10 @@ const useTiptapEditor = (props?: IProps) => {
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
-      ResizableImage.configure({
+      ResizableImage.extend({
+        selectable: props?.editable,
+        draggable: props?.editable,
+      }).configure({
         defaultWidth: 300,
         defaultHeight: Infinity,
         onUpload(file: File) {
@@ -76,6 +81,11 @@ const useTiptapEditor = (props?: IProps) => {
         },
       }),
     ],
+    [props?.editable]
+  );
+
+  const editor = useEditor({
+    extensions,
     editable: props?.editable,
     autofocus: true,
   });
@@ -93,15 +103,50 @@ const useTiptapEditor = (props?: IProps) => {
   }, [editor]);
 
   const parseToContent = useCallback(
-    (data: string) => JSON.parse(data) as Content,
+    (data: string) => generateHTML(JSON.parse(data) as JSONContent, extensions),
+    [extensions]
+  );
+
+  const cleanContent = useCallback(
+    (data: string) =>
+      sanitizeHtml(data, {
+        allowedAttributes: false,
+        allowedTags: [
+          "p",
+          "br",
+          "span",
+          "strong",
+          "b",
+          "em",
+          "i",
+          "u",
+          "s",
+          "blockquote",
+          "ul",
+          "ol",
+          "li",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "code",
+          "pre",
+          "a",
+          "img",
+        ],
+      }),
     []
   );
 
   const setContent = useCallback(
     (content: string) => {
-      editor?.commands?.setContent(parseToContent(content));
+      content = parseToContent(content);
+      content = cleanContent(content);
+      editor?.commands?.setContent(content);
     },
-    [editor, parseToContent]
+    [editor, parseToContent, cleanContent]
   );
 
   const extractContent = useCallback(() => {
@@ -112,7 +157,6 @@ const useTiptapEditor = (props?: IProps) => {
     TiptapEditor,
     TiptapMenuBar,
     setContent,
-    parseToContent,
     extractContent,
   };
 };

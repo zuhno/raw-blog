@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe } from "@nestjs/common";
 
 import { TagsService } from "./tags.service";
 
@@ -6,8 +6,13 @@ import { TagsService } from "./tags.service";
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
-  @Get(":name")
+  @Get("name/:name")
   searchByName(@Param("name") name: string) {
     return this.tagsService.searchByName(name);
+  }
+
+  @Get("id/:id")
+  searchById(@Param("id", ParseIntPipe) id: number) {
+    return this.tagsService.searchById(id);
   }
 }

@@ -1,7 +1,7 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { contentsApi } from "../../apis";
+import { contentsApi, tagsApi } from "../../apis";
 import { formatDateLocale } from "../../utils/date";
 
 interface IProps {
@@ -16,6 +16,7 @@ type ListData = NonNullable<
 
 const ContentList = ({ type, isOwner, showLabel }: IProps) => {
   const [data, setData] = useState<ListData>([]);
+  const [tagName, setTagName] = useState("");
   const { tagId } = useSearch({ strict: false }) as unknown as {
     tagId: string;
   };
@@ -30,12 +31,18 @@ const ContentList = ({ type, isOwner, showLabel }: IProps) => {
       .then((res) => {
         if (res.success) setData(res.data.contents);
       });
+    if (tagId) {
+      tagsApi.getSearchById(+tagId).then((res) => {
+        if (res.success) setTagName(res.data.name);
+      });
+    } else setTagName("");
   }, [tagId, type, isOwner]);
 
   if (!data.length) return;
 
   return (
     <div>
+      {tagName && <h2>Tag: {tagName}</h2>}
       {data.map((item) => {
         return (
           <div key={item.id} style={{ marginBottom: 20 }}>
@@ -44,7 +51,7 @@ const ContentList = ({ type, isOwner, showLabel }: IProps) => {
             </Link>
             <div>{formatDateLocale(item.createdAt)}</div>
             {showLabel && (
-              <div style={{ display: "flex", gap: 5 }}>
+              <div style={{ display: "flex", gap: 5, pointerEvents: "none" }}>
                 <button>{item.private ? "private" : "public"}</button>
                 <button>{item.publish ? "published" : "unpublished"}</button>
                 <button>{item.type.toLowerCase()}</button>

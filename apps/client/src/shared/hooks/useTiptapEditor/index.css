@@ -7,6 +7,12 @@
     padding: 0 10px;
   }
 
+  &[contenteditable="false"] {
+    .image-component {
+      --box-color: transparent;
+    }
+  }
+
   &:first-child {
     margin-top: 0;
   }

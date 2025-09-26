@@ -26,6 +26,7 @@ const EditTemplate = () => {
     let data = extractContent();
     data = await tiptapContentUpload(data).catch(() => null);
     if (!data) return;
+    console.log(data);
 
     const res = await contentsApi.patchUpdate(+id!, {
       title,

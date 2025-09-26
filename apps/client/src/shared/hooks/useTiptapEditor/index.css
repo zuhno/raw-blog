@@ -3,6 +3,7 @@
   border-radius: 0.2rem;
 
   &[contenteditable="true"] {
+    overflow-x: auto;
     border-color: gray;
     padding: 0 10px;
   }
@@ -10,6 +11,10 @@
   &[contenteditable="false"] {
     .image-component {
       --box-color: transparent;
+      img {
+        width: 100%;
+        height: auto;
+      }
     }
   }
 

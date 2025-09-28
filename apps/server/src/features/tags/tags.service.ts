@@ -28,14 +28,6 @@ export class TagsService {
     return this.repo.save(tagsEntities);
   }
 
-  async searchByName(name: string) {
-    return this.repo.find({ where: { name: Like(`%${name}%`) } });
-  }
-
-  async searchById(id: number) {
-    return this.repo.findOneBy({ id });
-  }
-
   async findAndCreateMany(tagNames: string[] = []) {
     if (tagNames.length === 0) return [];
 
@@ -51,5 +43,30 @@ export class TagsService {
     }
 
     return [...existingTags, ...newTags];
+  }
+
+  async searchByName(name: string) {
+    return this.repo.find({ where: { name: Like(`%${name}%`) } });
+  }
+
+  async searchById(id: number) {
+    return this.repo.findOneBy({ id });
+  }
+
+  async listWithCount() {
+    return this.repo
+      .createQueryBuilder("t")
+      .innerJoin("t.contents", "c", "c.publish = :pub AND c.private = :priv", {
+        pub: true,
+        priv: false,
+      })
+      .distinct(true)
+      .loadRelationCountAndMap("t.contentsCount", "t.contents", "vc", (qb) =>
+        qb
+          .where("vc.publish = :pub", { pub: true })
+          .andWhere("vc.private = :priv", { priv: false })
+      )
+      .orderBy("t.id", "ASC")
+      .getMany();
   }
 }

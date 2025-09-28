@@ -6,6 +6,11 @@ import { TagsService } from "./tags.service";
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
+  @Get()
+  listWithCount() {
+    return this.tagsService.listWithCount();
+  }
+
   @Get("name/:name")
   searchByName(@Param("name") name: string) {
     return this.tagsService.searchByName(name);

@@ -100,6 +100,7 @@ export class ContentsService {
     if (offset !== undefined) {
       query.andWhere(`c.id ${op} :offset`, { offset });
     }
+
     if (!owner) {
       query.andWhere("c.publish = true").andWhere("c.private = false");
     }

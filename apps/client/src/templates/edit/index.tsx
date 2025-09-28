@@ -26,7 +26,6 @@ const EditTemplate = () => {
     let data = extractContent();
     data = await tiptapContentUpload(data).catch(() => null);
     if (!data) return;
-    console.log(data);
 
     const res = await contentsApi.patchUpdate(+id!, {
       title,
@@ -53,8 +52,7 @@ const EditTemplate = () => {
             setContent(res.data.body);
             if (res.data.private) toggleIsPrivate();
             if (res.data.publish) toggleIsPublish();
-            if (res.data.tags.length)
-              initTag({ tags: res.data.tags, type: res.data.type });
+            if (res.data.tags.length) initTag(res.data.tags);
           }
         });
       })

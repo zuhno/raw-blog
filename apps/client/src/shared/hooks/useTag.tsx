@@ -11,7 +11,6 @@ const useTag = (props?: IProps) => {
 
   const navigate = useNavigate();
   const [tags, setTags] = useState<{ id?: number; name: string }[]>([]);
-  const [type, setType] = useState("POST");
 
   const onSubmitTag = (e: FormEvent) => {
     e.preventDefault();
@@ -43,26 +42,16 @@ const useTag = (props?: IProps) => {
     (tagId?: number) => {
       if (props.editable || tagId === undefined) return;
       navigate({
-        to: type === "POST" ? "/" : "/daily",
+        to: "/",
         search: { tagId },
       });
     },
-    [navigate, props.editable, type]
+    [navigate, props.editable]
   );
 
-  const initTag = useCallback(
-    ({
-      tags,
-      type,
-    }: {
-      tags: { id: number; name: string }[];
-      type: string;
-    }) => {
-      setTags(tags);
-      setType(type);
-    },
-    []
-  );
+  const initTag = useCallback((tags: { id: number; name: string }[]) => {
+    setTags(tags);
+  }, []);
 
   const TagList = useMemo(() => {
     return () => {

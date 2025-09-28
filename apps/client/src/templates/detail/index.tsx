@@ -39,7 +39,7 @@ const DetailTemplate = () => {
             if (res.success) {
               setData(res.data);
               setContent(res.data.body);
-              initTag({ tags: res.data.tags, type: res.data.type });
+              initTag(res.data.tags);
             }
           })
           .catch(() => {

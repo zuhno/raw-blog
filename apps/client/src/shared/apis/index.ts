@@ -79,6 +79,10 @@ export const commentsApi = {
 };
 
 export const tagsApi = {
+  getListWithCount: () => {
+    const { request, path } = endpoints.tags.listWithCount();
+    return request(path);
+  },
   getSearchByName: (name: string) => {
     const { request, path } = endpoints.tags.searchByName(name);
     return request(path);

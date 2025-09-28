@@ -52,8 +52,14 @@ const ContentList = ({ type, isOwner, showLabel }: IProps) => {
             <div>{formatDateLocale(item.createdAt)}</div>
             {showLabel && (
               <div style={{ display: "flex", gap: 5, pointerEvents: "none" }}>
-                <button>{item.private ? "private" : "public"}</button>
-                <button>{item.publish ? "published" : "unpublished"}</button>
+                {isOwner && (
+                  <>
+                    <button>{item.private ? "private" : "public"}</button>
+                    <button>
+                      {item.publish ? "published" : "unpublished"}
+                    </button>
+                  </>
+                )}
                 <button>{item.type.toLowerCase()}</button>
               </div>
             )}

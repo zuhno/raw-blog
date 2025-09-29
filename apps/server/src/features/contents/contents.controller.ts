@@ -8,7 +8,9 @@ import {
   Post,
   Delete,
   Query,
+  Req,
 } from "@nestjs/common";
+import type { Request } from "express";
 
 import { ContentsService } from "./contents.service";
 import { ListQuery } from "./dto/content-list.dto";
@@ -16,6 +18,7 @@ import { CreateContentDto } from "./dto/create-content.dto";
 import { UpdateContentDto } from "./dto/update-content.dto";
 import { RequestUser } from "../../shared/decorators/request-user.decorator";
 import { RequireUser } from "../../shared/decorators/require-user.decorator";
+import { COOKIE_KEY_VISITOR_ID } from "../../shared/utils/constant";
 import type { TRequestUser } from "../../shared/utils/type";
 
 @Controller()
@@ -53,9 +56,12 @@ export class ContentsController {
   @RequireUser({ strict: false })
   detail(
     @RequestUser() user: TRequestUser,
-    @Param("id", ParseIntPipe) id: number
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request
   ) {
-    return this.contentsService.detail(id, user?.id);
+    const visitorId: string = req.cookies[COOKIE_KEY_VISITOR_ID];
+
+    return this.contentsService.detail(id, user?.id, visitorId);
   }
 
   @Patch(":id")

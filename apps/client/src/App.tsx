@@ -1,6 +1,8 @@
 import { RouterProvider } from "@tanstack/react-router";
 
-import { router } from "./shared/configs/init";
+import { router, initFetch } from "./shared/configs/init";
+
+initFetch();
 
 const App = () => {
   return <RouterProvider router={router} />;

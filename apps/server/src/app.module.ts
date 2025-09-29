@@ -7,12 +7,14 @@ import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
 import { JwtCoreModule } from "./config/jwt/jwt-core.module";
 import { SecurityConfigModule } from "./config/security/security.module";
+import { AnalysisModule } from "./features/analysis/analysis.module";
 import { AuthModule } from "./features/auth/auth.module";
 import { CommentsModule } from "./features/comments/comments.module";
 import { ContentsModule } from "./features/contents/contents.module";
 import { FilesModule } from "./features/files/files.module";
 import { TagsModule } from "./features/tags/tags.module";
 import { UsersModule } from "./features/users/users.module";
+import { VisitorsModule } from "./features/visitors/visitors.module";
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { UsersModule } from "./features/users/users.module";
     CommentsModule,
     UsersModule,
     FilesModule,
+    VisitorsModule,
+    AnalysisModule,
 
     // Router
     RouterModule.register([
@@ -66,6 +70,14 @@ import { UsersModule } from "./features/users/users.module";
           {
             path: "files",
             module: FilesModule,
+          },
+          {
+            path: "visitors",
+            module: VisitorsModule,
+          },
+          {
+            path: "analysis",
+            module: AnalysisModule,
           },
         ],
       },

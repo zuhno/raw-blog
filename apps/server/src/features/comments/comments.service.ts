@@ -32,6 +32,7 @@ export class CommentsService {
     const content = await this.contentsService.detail(
       contentId,
       undefined,
+      undefined,
       true
     );
     if (!content) throw new NotFoundException("Content not found");

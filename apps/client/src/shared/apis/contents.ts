@@ -21,8 +21,12 @@ interface IListResp {
   lastOffset: number;
   hasNext: boolean;
 }
-interface IDetailResp extends IContent {}
+interface IDetailResp extends IContent {
+  views: number;
+}
 interface IUpdateResp extends IContent {}
+
+const prefix = "contents";
 
 export default {
   create: (data: {
@@ -34,12 +38,12 @@ export default {
     tags?: string[];
   }) => ({
     request: http.post<ICreateResp>,
-    path: "contents",
+    path: `${prefix}`,
     body: data,
   }),
   verify: (id: number) => ({
     request: http.get,
-    path: `contents/${id}/verify`,
+    path: `${prefix}/${id}/verify`,
   }),
   list: (query: {
     type?: "POST" | "DAILY";
@@ -50,14 +54,14 @@ export default {
     all?: number;
   }) => ({
     request: http.get<IListResp>,
-    path: "contents",
+    path: `${prefix}`,
     searchParams: new URLSearchParams(
       query as unknown as Record<string, string>
     ).toString(),
   }),
   detail: (id: number) => ({
     request: http.get<IDetailResp>,
-    path: `contents/${id}`,
+    path: `${prefix}/${id}`,
   }),
   update: (
     id: number,
@@ -71,7 +75,7 @@ export default {
     }
   ) => ({
     request: http.patch<IUpdateResp>,
-    path: `contents/${id}`,
+    path: `${prefix}/${id}`,
     body: data,
   }),
 };

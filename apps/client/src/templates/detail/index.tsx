@@ -70,6 +70,7 @@ const DetailTemplate = () => {
             </>
           )}
         </p>
+        {isOwner && <span>Views: {data.views}</span>}
         <TagList />
         <article style={{ marginTop: 30 }}>
           <TiptapEditor />

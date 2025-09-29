@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 
+import { ContentViewsService } from "../content-views/content-views.service";
 import type { CreateContentDto } from "./dto/create-content.dto";
 import type { UpdateContentDto } from "./dto/update-content.dto";
 import { Content } from "./entities/content.entity";
@@ -21,6 +22,7 @@ export class ContentsService {
     private readonly repo: Repository<Content>,
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
+    private readonly contentViewsService: ContentViewsService,
     private readonly dataSource: DataSource
   ) {}
 
@@ -178,7 +180,16 @@ export class ContentsService {
     return this.listQueryByTags(type, tagIds, offset, limit, sort, owner);
   }
 
-  async detail(id: number, userId?: number, bypass?: boolean) {
+  async detail(
+    id: number,
+    userId?: number,
+    visitorId?: string,
+    bypass?: boolean
+  ) {
+    if (visitorId) {
+      await this.contentViewsService.logContentView(id, visitorId);
+    }
+
     const content = await this.repo.findOne({
       where: { id },
       relations: ["tags"],
@@ -190,7 +201,9 @@ export class ContentsService {
         throw new ForbiddenException("Do not have access to the content");
     }
 
-    return content;
+    const views = await this.contentViewsService.getViewStats(id);
+
+    return { ...content, views };
   }
 
   async update(id: number, userId: number, data: UpdateContentDto) {

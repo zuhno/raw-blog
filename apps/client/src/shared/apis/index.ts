@@ -1,9 +1,11 @@
+import analysis from "./analysis";
 import auth from "./auth";
 import comments from "./comments";
 import contents from "./contents";
 import files from "./files";
 import tags from "./tags";
 import users from "./users";
+import visitors from "./visitors";
 
 const endpoints = {
   auth,
@@ -12,6 +14,8 @@ const endpoints = {
   tags,
   users,
   files,
+  visitors,
+  analysis,
 };
 
 export const authApi = {
@@ -104,5 +108,22 @@ export const filesApi = {
   postUploadImg: (file: File) => {
     const { request, path, body } = endpoints.files.uploadImage(file);
     return request(path, body);
+  },
+};
+
+export const visitorsApi = {
+  postLog: () => {
+    const { request, path } = endpoints.visitors.log();
+    return request(path);
+  },
+};
+
+export const analysisApi = {
+  getVisitorStats: (
+    query: Parameters<typeof endpoints.analysis.visitorStats>[0]
+  ) => {
+    const { request, path, searchParams } =
+      endpoints.analysis.visitorStats(query);
+    return request(path, { searchParams });
   },
 };

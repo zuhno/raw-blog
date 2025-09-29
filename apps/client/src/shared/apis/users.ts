@@ -7,6 +7,8 @@ interface IMeResp {
   avatarUrl: string;
 }
 
+const prefix = "users";
+
 export default {
-  me: () => ({ request: http.get<IMeResp>, path: "users/me" }),
+  me: () => ({ request: http.get<IMeResp>, path: `${prefix}/me` }),
 };

@@ -4,13 +4,15 @@ interface IUploadImageResp {
   url: string;
 }
 
+const prefix = "files";
+
 export default {
   uploadImage: (file: File) => {
     const data = new FormData();
     data.append("file", file);
     return {
       request: http.post<IUploadImageResp>,
-      path: "files/image",
+      path: `${prefix}/image`,
       body: data,
     };
   },

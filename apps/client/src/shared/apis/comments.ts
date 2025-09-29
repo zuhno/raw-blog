@@ -16,24 +16,26 @@ interface IListItem extends IComment {
 }
 type TListResp = IListItem[];
 
+const prefix = "comments";
+
 export default {
   create: (data: { contentId: number; parentId?: number; text: string }) => ({
     request: http.post<ICreateResp>,
-    path: "comments",
+    path: `${prefix}`,
     body: data,
   }),
   list: (id: number) => ({
     request: http.get<TListResp>,
-    path: "comments",
+    path: `${prefix}`,
     searchParam: new URLSearchParams({ contentId: String(id) }),
   }),
   update: (id: number, data: { text: string }) => ({
     request: http.patch<IUpdateResp>,
-    path: `comments/${id}`,
+    path: `${prefix}/${id}`,
     body: data,
   }),
   remove: (id: number) => ({
     request: http.delete<IRemoveResp>,
-    path: `comments/${id}`,
+    path: `${prefix}/${id}`,
   }),
 };

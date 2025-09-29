@@ -11,17 +11,19 @@ type TListWithCountResp = {
   contentsCount: number;
 }[];
 
+const prefix = "tags";
+
 export default {
   listWithCount: () => ({
     request: http.get<TListWithCountResp>,
-    path: `tags`,
+    path: `${prefix}`,
   }),
   searchByName: (name: string) => ({
     request: http.get<TSearchByNameResp>,
-    path: `tags/name/${name}`,
+    path: `${prefix}/name/${name}`,
   }),
   searchById: (id: number) => ({
     request: http.get<ISearchTagResp>,
-    path: `tags/id/${id}`,
+    path: `${prefix}/id/${id}`,
   }),
 };

@@ -8,10 +8,12 @@ interface ITokenRefreshResp {
   accessToken: string;
 }
 
+const prefix = "auth";
+
 export default {
   exchangeGoogleCode: (code: string) => ({
     request: http.post<IExchangeGoogleCodeResp>,
-    path: "auth/google/exchange",
+    path: `${prefix}/google/exchange`,
     body: { code },
     headers: {
       "X-Requested-With": "XmlHttpRequest",
@@ -20,7 +22,7 @@ export default {
   }),
   tokenRefresh: () => ({
     request: http.post<ITokenRefreshResp>,
-    path: "auth/refresh",
+    path: `${prefix}/refresh`,
   }),
-  signout: () => ({ request: http.post, path: "auth/signout" }),
+  signout: () => ({ request: http.post, path: `${prefix}/signout` }),
 };

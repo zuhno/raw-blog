@@ -27,7 +27,9 @@
   },
   "dependencies": {
     "@nestjs/mapped-types": "*",
+    "@types/cookie-parser": "^1.4.9",
     "axios": "^1.11.0",
+    "cookie-parser": "^1.4.7",
     "es-toolkit": "^1.39.9"
   },
   "devDependencies": {

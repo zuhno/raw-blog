@@ -7,15 +7,13 @@ export class DatabaseService implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
+    const isProd = process.env.NODE_ENV === "production";
     return {
       type: "postgres",
-      username: this.configService.get<string>("DB_USER"),
-      password: this.configService.get<string>("DB_PASSWORD"),
-      port: +this.configService.get<number>("DB_PORT")!,
-      host: this.configService.get<string>("DB_HOST"),
-      database: this.configService.get<string>("DB_SCHEMA"),
+      url: this.configService.get<string>("DB_URL"),
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV === "production" ? false : true,
+      synchronize: false,
+      ssl: isProd ? { rejectUnauthorized: false } : false,
     };
   }
 }

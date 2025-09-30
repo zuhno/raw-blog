@@ -117,7 +117,7 @@ importers:
     devDependencies:
       '@tanstack/router-plugin':
         specifier: ^1.131.27
-        version: 1.131.37(@tanstack/react-router@1.131.37(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))(webpack@5.100.2)
+        version: 1.131.37(@tanstack/react-router@1.131.37(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(webpack@5.100.2)
       '@types/react':
         specifier: ^19.1.9
         version: 19.1.12
@@ -129,10 +129,10 @@ importers:
         version: 2.16.0
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
+        version: 4.7.0(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       vite:
         specifier: ^7.1.0
-        version: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+        version: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   apps/server:
     dependencies:
@@ -172,6 +172,9 @@ importers:
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
       file-type:
         specifier: ^21.0.0
         version: 21.0.0
@@ -190,6 +193,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
       typeorm:
         specifier: ^0.3.25
         version: 0.3.26(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
@@ -3164,6 +3170,10 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
+  dotenv@17.2.3:
+    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -5413,6 +5423,11 @@ packages:
 
   tsx@4.20.5:
     resolution: {integrity: sha512-+wKjMNU9w/EaQayHXb7WA7ZaHY6hN8WgfvHNQ3t1PnU91/7O8TcTnIhCDYTZwnt8JsO9IBqZ30Ln1r7pPF52Aw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
+  tsx@4.20.6:
+    resolution: {integrity: sha512-ytQKuwgmrrkDTFP4LjR0ToE2nqgy886GpvRSpU0JAnrdBYppuY5rLkRUYPU1yCryb24SsKBTL/hlDQAEFVwtZg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -7927,7 +7942,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.131.37(@tanstack/react-router@1.131.37(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))(webpack@5.100.2)':
+  '@tanstack/router-plugin@1.131.37(@tanstack/react-router@1.131.37(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(webpack@5.100.2)':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.28.4)
@@ -7945,7 +7960,7 @@ snapshots:
       zod: 3.25.76
     optionalDependencies:
       '@tanstack/react-router': 1.131.37(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      vite: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       webpack: 5.100.2
     transitivePeerDependencies:
       - supports-color
@@ -8494,7 +8509,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@vitejs/plugin-react@4.7.0(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))':
+  '@vitejs/plugin-react@4.7.0(vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.4)
@@ -8502,7 +8517,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -9340,11 +9355,13 @@ snapshots:
 
   dotenv-expand@12.0.1:
     dependencies:
-      dotenv: 16.4.7
+      dotenv: 16.6.1
 
   dotenv@16.4.7: {}
 
   dotenv@16.6.1: {}
+
+  dotenv@17.2.3: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -12078,6 +12095,13 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
+  tsx@4.20.6:
+    dependencies:
+      esbuild: 0.25.9
+      get-tsconfig: 4.10.1
+    optionalDependencies:
+      fsevents: 2.3.3
+
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
@@ -12263,7 +12287,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1):
+  vite@7.1.5(@types/node@22.18.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.9
       fdir: 6.5.0(picomatch@4.0.3)
@@ -12275,7 +12299,7 @@ snapshots:
       '@types/node': 22.18.1
       fsevents: 2.3.3
       terser: 5.44.0
-      tsx: 4.20.5
+      tsx: 4.20.6
       yaml: 2.8.1
 
   w3c-keyname@2.2.8: {}

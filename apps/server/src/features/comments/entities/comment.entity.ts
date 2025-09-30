@@ -17,13 +17,13 @@ export class Comment {
   @PrimaryGeneratedColumn("increment")
   id!: number;
 
-  @Column({ name: "author_id" })
+  @Column({ type: "number", name: "author_id" })
   authorId!: number;
 
-  @Column({ name: "content_id" })
+  @Column({ type: "number", name: "content_id" })
   contentId!: number;
 
-  @Column({ name: "parent_id", nullable: true })
+  @Column({ type: "number", name: "parent_id", nullable: true })
   parentId?: number;
 
   @Column({ type: "text" })

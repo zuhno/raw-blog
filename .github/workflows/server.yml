@@ -1,63 +1,19 @@
-name: Deploy server Production
+name: Deploy server production
 on: workflow_dispatch
 
 jobs:
   build-deploy:
     if: ${{ github.ref_name == 'main' }}
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      SVC_ID: ${{ secrets.SERVER_RAILWAY_SERVICE_ID }}
+      RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
-
-      - name: Enable Corepack (pnpm)
-        run: corepack enable
-
-      - name: Create .env.prod
-        working-directory: ./apps/server
-        run: |
-          touch .env.prod
-          echo "PORT=${{ secrets.SERVER_PORT }}" >> .env.prod
-          echo "DB_URL=${{ secrets.SERVER_DB_URL }}" >> .env.prod
-          echo "GOOGLE_OAUTH_CLIENT_ID=${{ secrets.SERVER_GOOGLE_OAUTH_CLIENT_ID }}" >> .env.prod
-          echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.SERVER_GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env.prod
-          echo "GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.SERVER_GOOGLE_OAUTH_REDIRECT_URI }}" >> .env.prod
-          echo "CLOUDFLARE_R2_AUTH_TOKEN=${{ secrets.SERVER_CLOUDFLARE_R2_AUTH_TOKEN }}" >> .env.prod
-          echo "CLOUDFLARE_R2_ACCESS_ID=${{ secrets.SERVER_CLOUDFLARE_R2_ACCESS_ID }}" >> .env.prod
-          echo "CLOUDFLARE_R2_ACCESS_SECRET=${{ secrets.SERVER_CLOUDFLARE_R2_ACCESS_SECRET }}" >> .env.prod
-          echo "CLOUDFLARE_R2_ACCOUNT_ID=${{ secrets.SERVER_CLOUDFLARE_R2_ACCOUNT_ID }}" >> .env.prod
-          echo "CLOUDFLARE_R2_PUBLIC_URL=${{ secrets.SERVER_CLOUDFLARE_R2_PUBLIC_URL }}" >> .env.prod
-          echo "CLOUDFLARE_R2_BUCKET=${{ secrets.SERVER_CLOUDFLARE_R2_BUCKET }}" >> .env.prod
-          echo "GOOGLE_SIGNIN_JWT_SECRET=${{ secrets.SERVER_GOOGLE_SIGNIN_JWT_SECRET }}" >> .env.prod
-          echo "ALLOW_ACCESS_ORIGIN=${{ secrets.SERVER_ALLOW_ACCESS_ORIGIN }}" >> .env.prod
-          echo "OWNER_EMAIL=${{ secrets.SERVER_OWNER_EMAIL }}" >> .env.prod
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Link Railway Project
-        env:
-          RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
-        run: |
-          railway login --token $RAILWAY_TOKEN
-          railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }} --service server
-
-      - name: Build project
-        working-directory: ./apps/server
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run build
-
       - name: Deploy to Railway
-        working-directory: ./apps/server
-        env:
-          RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
-        run: railway up --service server --detach --env .env.prod
-      
+        run: railway up --service=${{ env.SVC_ID }}

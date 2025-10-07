@@ -3,16 +3,24 @@ import { randomUUID } from "crypto";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Inject, Injectable, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { fileTypeFromBuffer } from "file-type";
+import { loadEsm } from "load-esm";
 
 import { R2_CLIENT } from "../../config/infra/r2/r2.client";
 
 @Injectable()
 export class FilesService {
+  fileTypeFromBuffer: (typeof import("file-type"))["fileTypeFromBuffer"];
+
   constructor(
     @Inject(R2_CLIENT) private readonly s3: S3Client,
     private configService: ConfigService
-  ) {}
+  ) {
+    (async () => {
+      this.fileTypeFromBuffer = (
+        await loadEsm<typeof import("file-type")>("file-type")
+      ).fileTypeFromBuffer;
+    })();
+  }
 
   private allowed = new Set([
     "image/png",
@@ -32,7 +40,7 @@ export class FilesService {
     const { buffer, mime, keyPrefix } = params;
     const bucket = this.configService.get("CLOUDFLARE_R2_BUCKET");
 
-    const sniff = await fileTypeFromBuffer(buffer);
+    const sniff = await this.fileTypeFromBuffer(buffer);
     const detected = sniff?.mime ?? mime;
     if (!this.allowed.has(detected)) {
       throw new BadRequestException(

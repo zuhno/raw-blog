@@ -181,6 +181,9 @@ importers:
       googleapis:
         specifier: ^156.0.0
         version: 156.0.0
+      load-esm:
+        specifier: ^1.0.3
+        version: 1.0.3
       multer:
         specifier: ^2.0.2
         version: 2.0.2
@@ -4284,6 +4287,10 @@ packages:
 
   load-esm@1.0.2:
     resolution: {integrity: sha512-nVAvWk/jeyrWyXEAs84mpQCYccxRqgKY4OznLuJhJCa0XsPSfdOIr2zvBZEj3IHEHbX97jjscKRRV539bW0Gpw==}
+    engines: {node: '>=13.2.0'}
+
+  load-esm@1.0.3:
+    resolution: {integrity: sha512-v5xlu8eHD1+6r8EHTg6hfmO97LN8ugKtiXcy5e6oN72iD2r6u0RPfLl6fxM+7Wnh2ZRq15o0russMst44WauPA==}
     engines: {node: '>=13.2.0'}
 
   loader-runner@4.3.0:
@@ -10846,6 +10853,8 @@ snapshots:
       wrap-ansi: 9.0.2
 
   load-esm@1.0.2: {}
+
+  load-esm@1.0.3: {}
 
   loader-runner@4.3.0: {}
 

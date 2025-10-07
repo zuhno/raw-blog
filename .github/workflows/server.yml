@@ -42,22 +42,17 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Link Railway Project
-        env:
-          RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
-        run: |
-          railway login --token $RAILWAY_TOKEN
-          railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }} --service server
-
       - name: Build project
         working-directory: ./apps/server
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
 
-      - name: Deploy to Railway
+      - name: Link & Deploy to Railway
         working-directory: ./apps/server
         env:
           RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
-        run: railway up --service server --detach --env .env.prod
+        run: |
+          railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }} --service server
+          railway up --service server --detach --env .env.prod
       

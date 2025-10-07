@@ -63,4 +63,4 @@ jobs:
 
       - name: Deploy to Railway
         working-directory: ./apps/server
-        run: railway up --service server --detach --env .env.prod
+        run: railway up --service server --detach --environment .env.prod

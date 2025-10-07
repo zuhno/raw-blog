@@ -5,6 +5,8 @@ jobs:
   build-deploy:
     if: ${{ github.ref_name == 'main' }}
     runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,18 +44,22 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Build project
+      - name: Check Railway CLI version (debug)
+        run: railway --version
+
+      - name: Ensure login (compat)
+        run: |
+          echo "$RAILWAY_TOKEN" | railway login --ci || echo "Using env token mode"
+
+      - name: Link project
+        run: railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }}
+
+      - name: Install & Build
         working-directory: ./apps/server
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
 
-      - name: Link & Deploy to Railway
+      - name: Deploy to Railway
         working-directory: ./apps/server
-        env:
-          RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
-        run: |
-          railway login --browserless
-          railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }} --service server
-          railway up --service server --detach --env .env.prod
-      
+        run: railway up --service server --detach --env .env.prod

@@ -5,6 +5,8 @@ jobs:
   build-deploy:
     if: ${{ github.ref_name == 'main' }}
     runs-on: ubuntu-latest
+    env:
+        RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,8 +52,6 @@ jobs:
 
       - name: Link & Deploy to Railway
         working-directory: ./apps/server
-        env:
-          RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
         run: |
           railway link --project ${{ secrets.SERVER_RAILWAY_PROJECT_ID }} --service server
           railway up --service server --detach --env .env.prod

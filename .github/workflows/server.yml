@@ -29,6 +29,7 @@ jobs:
         run: railway --version
 
       - name: Write Railway config
+        working-directory: ./apps/server
         run: |
           mkdir -p .railway
           printf '{"projectId":"%s","serviceId":"%s"}' \

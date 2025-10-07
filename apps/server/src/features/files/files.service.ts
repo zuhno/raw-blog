@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Inject, Injectable, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { fileTypeFromBuffer } from "file-type";
+import { fileTypeFromBuffer } from "file-type/core";
 
 import { R2_CLIENT } from "../../config/infra/r2/r2.client";
 

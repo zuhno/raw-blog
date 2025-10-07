@@ -1,0 +1,21 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "projectId": "217e45b7-4d7b-4184-9bc3-d8fe82f8360c",
+  "serviceId": "c00594cb-d3d1-4757-8315-eb362cc7fe19",
+  "root": ".",
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "setup": { "nixPkgs": ["nodejs_22.14.0", "pnpm_9"] },
+        "install": {
+          "cmds": ["pnpm install --frozen-lockfile"]
+        },
+        "build": { "cmds": ["pnpm --filter ./apps/server run build"] }
+      }
+    }
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter ./apps/server run start:prod"
+  }
+}

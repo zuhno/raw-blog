@@ -1,0 +1,12 @@
+name: Deploy client production
+on: workflow_dispatch
+
+jobs:
+  build-deploy:
+    if: ${{ github.ref_name == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false

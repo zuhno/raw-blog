@@ -37,9 +37,6 @@ export class Content {
   @Column({ type: "enum", enum: EContentType })
   type!: EContentType;
 
-  @Column({ type: "varchar", default: false })
-  test: string;
-
   @CreateDateColumn({ type: "timestamptz", name: "created_at" })
   createdAt!: Date;
 

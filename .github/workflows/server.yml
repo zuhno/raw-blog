@@ -18,32 +18,27 @@ jobs:
 
       - name: Create Railway config
         run: |
-          jq -n \
-            --arg schema "https://railway.com/railway.schema.json" \
-            --arg projectId "$PRJ_ID" \
-            --arg serviceId "$SVC_ID" \
-            '{
-              "$schema": $schema,
-              "projectId": $projectId,
-              "serviceId": $serviceId,
-              "root": ".",
-              "build": {
-                "builder": "NIXPACKS",
-                "nixpacksPlan": {
-                  "phases": {
-                    "setup": { "nixPkgs": ["nodejs_22.14.0", "pnpm_9"] },
-                    "install": { "cmds": ["pnpm install --frozen-lockfile"] },
-                    "build":   { "cmds": ["pnpm --filter ./apps/server run build"] }
-                  }
+          cat > railway.json <<EOF
+          {
+            "$schema": "https://railway.com/railway.schema.json",
+            "projectId": "${PRJ_ID}",
+            "serviceId": "${SVC_ID}",
+            "root": ".",
+            "build": {
+              "builder": "NIXPACKS",
+              "nixpacksPlan": {
+                "phases": {
+                  "setup": { "nixPkgs": ["nodejs_22.14.0", "pnpm_9"] },
+                  "install": { "cmds": ["pnpm install --frozen-lockfile"] },
+                  "build": { "cmds": ["pnpm --filter ./apps/server run build"] }
                 }
-              },
-              "deploy": {
-                "startCommand": "pnpm --filter ./apps/server run start:prod"
               }
-            }' > railway.json
-
-          echo "Generated railway.json:"
-          jq . railway.json
+            },
+            "deploy": {
+              "startCommand": "pnpm --filter ./apps/server run start:prod"
+            }
+          }
+          EOF
 
       - name: Deploy to Railway
         run: railway up --service=${{ env.SVC_ID }}

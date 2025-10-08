@@ -34,8 +34,7 @@ jobs:
         run: pnpm build:prod
 
       - name: Publish
-        working-directory: ./apps/client
-        run: pnpm --package=netlify-cli dlx netlify deploy --dir=./apps/client/dist --prod
+        run: pnpm --package=netlify-cli dlx netlify deploy --dir=./apps/client/dist --prod --no-build
         env:
           NETLIFY_SITE_ID: ${{ secrets.CLIENT_NETLIFY_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.CLIENT_NETLIFY_AUTH_TOKEN }}

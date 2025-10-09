@@ -114,6 +114,7 @@ const useTiptapEditor = (props?: IProps) => {
         allowedTags: [
           "p",
           "br",
+          "hr",
           "span",
           "strong",
           "b",

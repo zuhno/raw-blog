@@ -4,6 +4,7 @@ import { Controller, Post, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
 
 import { VisitorsService } from "./visitors.service";
+import { BotFilter } from "../../shared/decorators/bot-filter.decorator";
 import {
   COOKIE_KEY_VISITOR_ID,
   COOKIE_POLICY_VISITOR_ID,
@@ -14,6 +15,7 @@ export class VisitorsController {
   constructor(private readonly visitorsService: VisitorsService) {}
 
   @Post("log")
+  @BotFilter()
   async logVisitor(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response

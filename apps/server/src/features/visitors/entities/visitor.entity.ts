@@ -9,7 +9,7 @@ import {
 @Entity("visitors")
 @Index(["visitorId", "visitDateKst"], { unique: true })
 export class Visitor {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column({ type: "varchar", name: "visitor_id", length: 36 })

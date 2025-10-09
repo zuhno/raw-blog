@@ -6,19 +6,18 @@ import {
   mixin,
   Type,
 } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import type { Request } from "express";
 
 export function BotGuard(): Type<CanActivate> {
   @Injectable()
   class Guard implements CanActivate {
-    constructor(private readonly jwtService: JwtService) {}
+    constructor() {}
 
     async canActivate(ctx: ExecutionContext): Promise<boolean> {
       const req = ctx.switchToHttp().getRequest<Request>();
 
       const ua = req.header("clientUa") || req.header("user-agent") || "";
-      console.log(ua);
+
       const botKeywords = [
         "bot",
         "crawl",

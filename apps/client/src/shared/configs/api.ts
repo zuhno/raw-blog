@@ -33,6 +33,7 @@ const api = ky.create({
   retry: {
     limit: 0,
   },
+  keepalive: true,
   hooks: {
     beforeRequest: [
       async (request) => {

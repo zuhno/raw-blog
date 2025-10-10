@@ -16,6 +16,7 @@ const EditTemplate = () => {
   const [type, setType, onChangeType] = useInput<HTMLSelectElement>("POST");
   const [isPrivate, toggleIsPrivate] = useToggle();
   const [isPublish, toggleIsPublish] = useToggle();
+  const [isPendingSave, toggleIsPendingSave] = useToggle(false);
 
   const { TiptapEditor, TiptapMenuBar, setContent, extractContent } =
     useTiptapEditor({ editable: true });
@@ -23,20 +24,27 @@ const EditTemplate = () => {
   const { tagNames, initTag, TagList, TagForm } = useTag();
 
   const onSave = async () => {
-    let data = extractContent();
-    data = await tiptapContentUpload(data).catch(() => null);
-    if (!data) return;
+    if (isPendingSave) return;
 
-    const res = await contentsApi.patchUpdate(+id!, {
-      title,
-      body: JSON.stringify(data),
-      private: isPrivate,
-      publish: isPublish,
-      type,
-      tags: tagNames,
-    });
-    if (res.success) {
-      navigate({ to: "/detail/$id", params: { id: id! }, replace: true });
+    toggleIsPendingSave();
+    try {
+      let data = extractContent();
+      data = await tiptapContentUpload(data).catch(() => null);
+      if (!data) return;
+
+      const res = await contentsApi.patchUpdate(+id!, {
+        title,
+        body: JSON.stringify(data),
+        private: isPrivate,
+        publish: isPublish,
+        type,
+        tags: tagNames,
+      });
+      if (res.success) {
+        navigate({ to: "/detail/$id", params: { id: id! }, replace: true });
+      }
+    } finally {
+      toggleIsPendingSave();
     }
   };
 
@@ -109,7 +117,9 @@ const EditTemplate = () => {
             <option value="DAILY">Daily</option>
           </select>
           {" | "}
-          <button onClick={onSave}>Save</button>
+          <button onClick={onSave}>
+            {isPendingSave ? "Saving..." : "Save"}
+          </button>
         </p>
         <TagList />
         <TagForm />

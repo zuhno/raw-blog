@@ -1,5 +1,6 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import cookieParser from "cookie-parser";
 
 import { AppModule } from "./app.module";
@@ -10,9 +11,10 @@ import { ResponseInterceptor } from "./shared/interceptors/response.interceptor"
 const PORT = process.env.PORT ?? 8080;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const allowed = app.get<string[]>(ALLOWED_ORIGINS);
 
+  app.set("trust proxy", 1);
   app.enableCors({ origin: allowed, credentials: true });
   app.use(cookieParser());
   app.useGlobalInterceptors(new ResponseInterceptor());

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { RouterModule } from "@nestjs/core";
+import { APP_GUARD, RouterModule } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { DatabaseModule } from "./config/database/database.module";
@@ -31,6 +32,12 @@ import { VisitorsModule } from "./features/visitors/visitors.module";
       useClass: DatabaseService,
       inject: [DatabaseService],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 1000 * 60, // 1m (block duration default value is from ttl)
+        limit: 30,
+      },
+    ]),
 
     // API Module
     AuthModule,
@@ -84,6 +91,6 @@ import { VisitorsModule } from "./features/visitors/visitors.module";
     ]),
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

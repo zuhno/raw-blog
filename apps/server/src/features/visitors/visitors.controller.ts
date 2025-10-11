@@ -20,6 +20,8 @@ export class VisitorsController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
+    const ip = req.header("X-Real-IP");
+    console.log(ip);
     let visitorId: string = req.cookies[COOKIE_KEY_VISITOR_ID];
 
     if (!visitorId) {
@@ -27,6 +29,6 @@ export class VisitorsController {
       res.cookie(COOKIE_KEY_VISITOR_ID, visitorId, COOKIE_POLICY_VISITOR_ID);
     }
 
-    await this.visitorsService.logVisitor(visitorId);
+    await this.visitorsService.logVisitor(visitorId, ip);
   }
 }

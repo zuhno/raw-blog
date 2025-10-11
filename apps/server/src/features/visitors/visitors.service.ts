@@ -31,13 +31,13 @@ export class VisitorsService {
     return query.getRawMany<{ date: string; count: number }>();
   }
 
-  async logVisitor(visitorId: string): Promise<void> {
+  async logVisitor(visitorId: string, ip?: string): Promise<void> {
     try {
       const now = new Date();
       const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
       const visitDateKst = kstDate.toISOString().split("T")[0];
 
-      const newVisitor = this.repo.create({ visitorId, visitDateKst });
+      const newVisitor = this.repo.create({ visitorId, ip, visitDateKst });
       await this.repo.save(newVisitor);
     } catch (error) {
       if (

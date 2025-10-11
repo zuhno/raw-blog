@@ -15,9 +15,12 @@ export class Visitor {
   @Column({ type: "varchar", name: "visitor_id", length: 36 })
   visitorId: string;
 
-  @CreateDateColumn({ type: "timestamptz", name: "visited_at" })
-  visitedAt: Date;
+  @Column({ type: "varchar", nullable: true })
+  ip: string;
 
   @Column({ type: "date", name: "visit_date_kst" })
   visitDateKst: string;
+
+  @CreateDateColumn({ type: "timestamptz", name: "visited_at" })
+  visitedAt: Date;
 }

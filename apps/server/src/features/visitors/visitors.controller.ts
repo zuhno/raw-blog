@@ -9,6 +9,7 @@ import {
   COOKIE_KEY_VISITOR_ID,
   COOKIE_POLICY_VISITOR_ID,
 } from "../../shared/utils/constant";
+import { getClientIpFromHeaders } from "../../shared/utils/ip";
 
 @Controller()
 export class VisitorsController {
@@ -20,8 +21,7 @@ export class VisitorsController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    const ip = req.header("X-Real-IP");
-    console.log(ip);
+    const ip = getClientIpFromHeaders(req);
     let visitorId: string = req.cookies[COOKIE_KEY_VISITOR_ID];
 
     if (!visitorId) {

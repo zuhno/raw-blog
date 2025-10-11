@@ -14,7 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const allowed = app.get<string[]>(ALLOWED_ORIGINS);
 
-  app.set("trust proxy", 1);
+  app.set("trust proxy", true);
   app.enableCors({ origin: allowed, credentials: true });
   app.use(cookieParser());
   app.useGlobalInterceptors(new ResponseInterceptor());

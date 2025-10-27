@@ -17,7 +17,7 @@ export const COOKIE_POLICY_REFRESH_TOKEN = (
         sameSite: "strict",
         secure: true,
         path: "/",
-        domain: ".zuhno.io",
+        domain: ".zuhno.org",
         maxAge: 1000 * 60 * 60 * 24 * 8, // 8d
       }
 ) as CookieOptions;
@@ -39,7 +39,7 @@ export const COOKIE_POLICY_VISITOR_ID = (
         sameSite: "strict",
         secure: true,
         path: "/",
-        domain: ".zuhno.io",
+        domain: ".zuhno.org",
         maxAge: 1000 * 60 * 60 * 24 * 365, // 1y
       }
 ) as CookieOptions;

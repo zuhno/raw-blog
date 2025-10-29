@@ -23,8 +23,10 @@ const EditTemplate = () => {
   const { tiptapContentUpload } = useUploadImage();
   const { tagNames, initTag, TagList, TagForm } = useTag();
 
+  const availableSave = !isPendingSave && title !== "";
+
   const onSave = async () => {
-    if (isPendingSave) return;
+    if (!availableSave) return;
 
     toggleIsPendingSave();
     try {
@@ -78,8 +80,6 @@ const EditTemplate = () => {
     initTag,
   ]);
 
-  if (!title) return;
-
   return (
     <>
       <div>
@@ -117,7 +117,7 @@ const EditTemplate = () => {
             <option value="DAILY">Daily</option>
           </select>
           {" | "}
-          <button onClick={onSave}>
+          <button onClick={onSave} disabled={!availableSave}>
             {isPendingSave ? "Saving..." : "Save"}
           </button>
         </p>

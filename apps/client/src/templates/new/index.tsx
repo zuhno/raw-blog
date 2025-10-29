@@ -17,6 +17,7 @@ const NewTemplate = () => {
   const [type, , onChangeType] = useInput<HTMLSelectElement>("POST");
   const [isPrivate, toggleIsPrivate] = useToggle();
   const [isPublish, toggleIsPublish] = useToggle();
+  const [isPendingSave, toggleIsPendingSave] = useToggle(false);
 
   const { TiptapEditor, TiptapMenuBar, extractContent } = useTiptapEditor({
     editable: true,
@@ -24,25 +25,34 @@ const NewTemplate = () => {
   const { tiptapContentUpload } = useUploadImage();
   const { tagNames, TagList, TagForm } = useTag();
 
-  const onSave = async () => {
-    let data = extractContent();
-    data = await tiptapContentUpload(data).catch(() => null);
-    if (!data) return;
+  const availableSave = !isPendingSave && title !== "";
 
-    const res = await contentsApi.postCreate({
-      title,
-      body: JSON.stringify(data),
-      private: isPrivate,
-      publish: isPublish,
-      type,
-      tags: tagNames,
-    });
-    if (res.success) {
-      navigate({
-        to: "/detail/$id",
-        params: { id: "" + res.data.id },
-        replace: true,
+  const onSave = async () => {
+    if (!availableSave) return;
+
+    toggleIsPendingSave();
+    try {
+      let data = extractContent();
+      data = await tiptapContentUpload(data).catch(() => null);
+      if (!data) return;
+
+      const res = await contentsApi.postCreate({
+        title,
+        body: JSON.stringify(data),
+        private: isPrivate,
+        publish: isPublish,
+        type,
+        tags: tagNames,
       });
+      if (res.success) {
+        navigate({
+          to: "/detail/$id",
+          params: { id: "" + res.data.id },
+          replace: true,
+        });
+      }
+    } finally {
+      toggleIsPendingSave();
     }
   };
 
@@ -88,7 +98,9 @@ const NewTemplate = () => {
             <option value="DAILY">Daily</option>
           </select>
           {" | "}
-          <button onClick={onSave}>Save</button>
+          <button onClick={onSave} disabled={!availableSave}>
+            {isPendingSave ? "Saving..." : "Save"}
+          </button>
         </p>
         <TagList />
         <TagForm />

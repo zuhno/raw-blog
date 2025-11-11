@@ -2,4 +2,3 @@
 .eslintcache
 node_modules
 pnpm-debug.log*
-railway.json

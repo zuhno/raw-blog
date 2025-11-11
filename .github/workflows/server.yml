@@ -5,40 +5,36 @@ jobs:
   build-deploy:
     if: ${{ github.ref_name == 'main' }}
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-    env:
-      PRJ_ID: ${{ secrets.SERVER_RAILWAY_PROJECT_ID }}
-      SVC_ID: ${{ secrets.SERVER_RAILWAY_SERVICE_ID }}
-      RAILWAY_TOKEN: ${{ secrets.SERVER_RAILWAY_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: Create Railway config
+      - name: .env.PROD setting
+        working-directory: ./apps/server
         run: |
-          cat > railway.json <<EOF
-          {
-            "$schema": "https://railway.com/railway.schema.json",
-            "projectId": "${PRJ_ID}",
-            "serviceId": "${SVC_ID}",
-            "root": ".",
-            "build": {
-              "builder": "NIXPACKS",
-              "nixpacksPlan": {
-                "phases": {
-                  "setup": { "nixPkgs": ["nodejs_22.14.0", "pnpm_9"] },
-                  "install": { "cmds": ["pnpm install --frozen-lockfile"] },
-                  "build": { "cmds": ["pnpm --filter ./apps/server run build"] }
-                }
-              }
-            },
-            "deploy": {
-              "startCommand": "pnpm --filter ./apps/server run start:prod"
-            }
-          }
-          EOF
+          touch .env.PROD
+          echo "PORT=${{ secrets.SERVER_PORT }}" >> .env.PROD
+          echo "DB_URL=${{ secrets.SERVER_DB_URL }}" >> .env.PROD
+          echo "GOOGLE_OAUTH_CLIENT_ID=${{ secrets.SERVER_GOOGLE_OAUTH_CLIENT_ID }}" >> .env.PROD
+          echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.SERVER_GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env.PROD
+          echo "GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.SERVER_GOOGLE_OAUTH_REDIRECT_URI }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_AUTH_TOKEN=${{ secrets.SERVER_CLOUDFLARE_R2_AUTH_TOKEN }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_ACCESS_ID=${{ secrets.SERVER_CLOUDFLARE_R2_ACCESS_ID }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_ACCESS_SECRET=${{ secrets.SERVER_CLOUDFLARE_R2_ACCESS_SECRET }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_ACCOUNT_ID=${{ secrets.SERVER_CLOUDFLARE_R2_ACCOUNT_ID }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_PUBLIC_URL=${{ secrets.SERVER_CLOUDFLARE_R2_PUBLIC_URL }}" >> .env.PROD
+          echo "CLOUDFLARE_R2_BUCKET=${{ secrets.SERVER_CLOUDFLARE_R2_BUCKET }}" >> .env.PROD
+          echo "GOOGLE_SIGNIN_JWT_SECRET=${{ secrets.SERVER_GOOGLE_SIGNIN_JWT_SECRET }}" >> .env.PROD
+          echo "ALLOW_ACCESS_ORIGIN=${{ secrets.SERVER_ALLOW_ACCESS_ORIGIN }}" >> .env.PROD
+          echo "OWNER_EMAIL=${{ secrets.SERVER_OWNER_EMAIL }}" >> .env.PROD
 
-      - name: Deploy to Railway
-        run: railway up --service=${{ env.SVC_ID }}
+      - name: setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Publish
+        run: flyctl deploy --config apps/server/fly.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+ 

@@ -11,7 +11,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: .env.PROD setting
+      - name: .env.prod setting
         working-directory: ./apps/server
         run: |
           touch .env.prod

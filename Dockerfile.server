@@ -9,8 +9,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 WORKDIR /app
-COPY . .
-RUN rm -rf ./apps/client
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/server ./apps/server
 
 WORKDIR /app/apps/server
 RUN pnpm install --frozen-lockfile

@@ -6,6 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { DatabaseModule } from "./config/database/database.module";
 import { DatabaseService } from "./config/database/database.service";
+import { HealthCheckModule } from "./config/health-check/health-check.module";
 import { JwtCoreModule } from "./config/jwt/jwt-core.module";
 import { SecurityConfigModule } from "./config/security/security.module";
 import { AnalysisModule } from "./features/analysis/analysis.module";
@@ -38,6 +39,7 @@ import { VisitorsModule } from "./features/visitors/visitors.module";
         limit: 30,
       },
     ]),
+    HealthCheckModule,
 
     // API Module
     AuthModule,

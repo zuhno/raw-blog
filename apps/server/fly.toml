@@ -38,6 +38,7 @@ soft_limit = 20
 interval = '15s'
 timeout = '5s'
 grace_period = '1s'
+path = '/health'
 
 [[vm]]
 size = 'shared-cpu-1x'

@@ -1,12 +1,12 @@
-# fly.toml app configuration file generated for raw-blog-back-server on 2025-11-11T16:35:12+09:00
+# fly.toml app configuration file generated for blog-back-server on 2025-11-12T09:14:36+09:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = 'raw-blog-back-server'
-primary_region = 'sin'
+app = 'blog-back-server'
+primary_region = 'nrt'
 
 [build]
-dockerfile = '../../Dockerfile.server'
 
 [env]
 PORT = '8080'

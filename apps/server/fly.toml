@@ -7,6 +7,7 @@ app = 'blog-back-server'
 primary_region = 'nrt'
 
 [build]
+dockerfile = "../../Dockerfile.server"
 
 [env]
 PORT = '8080'

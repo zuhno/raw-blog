@@ -11,6 +11,11 @@ export class TagsController {
     return this.tagsService.listWithCount();
   }
 
+  @Get("names")
+  nameList() {
+    return this.tagsService.nameList();
+  }
+
   @Get("name/:name")
   searchByName(@Param("name") name: string) {
     return this.tagsService.searchByName(name);

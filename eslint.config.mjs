@@ -132,6 +132,7 @@ export default [
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-return": "off",
       "react-refresh/only-export-components": "off",
+      "react-hooks/exhaustive-deps": "off",
       "import/order": [
         "warn",
         {

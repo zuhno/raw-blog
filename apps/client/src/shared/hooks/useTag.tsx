@@ -1,6 +1,14 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useMemo, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { LuX } from "react-icons/lu";
+
+import { tagsApi } from "../apis";
 
 interface IProps {
   editable: boolean;
@@ -8,8 +16,9 @@ interface IProps {
 
 const useTag = (props?: IProps) => {
   if (!props) props = { editable: true };
-
   const navigate = useNavigate();
+
+  const [usedTags, setUsedTags] = useState<string[]>([]);
   const [tags, setTags] = useState<{ id?: number; name: string }[]>([]);
 
   const onSubmitTag = (e: FormEvent) => {
@@ -53,6 +62,15 @@ const useTag = (props?: IProps) => {
     setTags(tags);
   }, []);
 
+  useEffect(() => {
+    tagsApi
+      .getNameList()
+      .then((res) => {
+        if (res.success) setUsedTags(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const TagList = useMemo(() => {
     return () => {
       if (!tags.length) return null;
@@ -87,13 +105,18 @@ const useTag = (props?: IProps) => {
   const TagForm = useMemo(() => {
     return () => {
       return (
-        <form onSubmit={onSubmitTag}>
-          <input id="tag" name="tag" type="text" />
+        <form onSubmit={onSubmitTag} autoComplete="off">
+          <input id="tag" name="tag" list="usedTagList" type="text" />
+          <datalist id="usedTagList">
+            {usedTags.map((item, idx) => {
+              return <option key={idx} value={item}></option>;
+            })}
+          </datalist>
           <button type="submit">Tag+</button>
         </form>
       );
     };
-  }, []);
+  }, [usedTags.length]);
 
   return {
     tagNames: tags.map((tag) => tag.name),

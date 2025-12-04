@@ -87,6 +87,10 @@ export const tagsApi = {
     const { request, path } = endpoints.tags.listWithCount();
     return request(path);
   },
+  getNameList: () => {
+    const { request, path } = endpoints.tags.nameList();
+    return request(path);
+  },
   getSearchByName: (name: string) => {
     const { request, path } = endpoints.tags.searchByName(name);
     return request(path);

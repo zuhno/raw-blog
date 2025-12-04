@@ -18,6 +18,10 @@ export default {
     request: http.get<TListWithCountResp>,
     path: `${prefix}`,
   }),
+  nameList: () => ({
+    request: http.get<string[]>,
+    path: `${prefix}/names`,
+  }),
   searchByName: (name: string) => ({
     request: http.get<TSearchByNameResp>,
     path: `${prefix}/name/${name}`,

@@ -53,6 +53,10 @@ export class TagsService {
     return this.repo.findOneBy({ id });
   }
 
+  async nameList() {
+    return (await this.repo.find({ select: ["name"] })).map((row) => row.name);
+  }
+
   async listWithCount() {
     return this.repo
       .createQueryBuilder("t")
